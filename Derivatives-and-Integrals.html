@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Derivatives &amp; Integrals — the two directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E9EFF3;
+    --paper-2:#DCE5EC;
+    --ink:#11243A;
+    --ink-soft:#3D5670;
+    --slope:#6C3FC7;      /* derivative */
+    --fill:#12996B;       /* integral */
+    --gold:#F2A413;
+    --warn:#C93C86;
+    --display:"Bricolage Grotesque","Arial Black",sans-serif;
+    --body:"Newsreader",Georgia,serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --edge:3px solid var(--ink);
+    --hard:6px 6px 0 var(--ink);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);
+    font-size:18px;line-height:1.6;
+    background-image:radial-gradient(var(--paper-2) 1.1px,transparent 1.2px);background-size:22px 22px}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 20px}
+  h1,h2,h3,.eyebrow,.btn,.tag{font-family:var(--display)}
+  h2{font-size:clamp(28px,5vw,44px);line-height:1.02;letter-spacing:-.02em;margin:0 0 6px;font-weight:800}
+  h3{font-size:22px;line-height:1.15;margin:0 0 8px;font-weight:700}
+  p{margin:0 0 14px}
+  .lead{font-size:20px}
+  .mono{font-family:var(--mono)}
+  .eyebrow{display:inline-block;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    font-weight:700;background:var(--ink);color:var(--paper);padding:5px 10px;margin-bottom:14px}
+  .eyebrow.on-dark{background:var(--gold);color:var(--ink)}
+  .eyebrow.d{background:var(--slope);color:#fff}
+  .eyebrow.i{background:var(--fill);color:#fff}
+
+  .hero{background:var(--ink);color:#F3F7FA;padding:38px 0 46px;border-bottom:var(--edge)}
+  .hero h1{font-size:clamp(38px,8.2vw,78px);line-height:.94;letter-spacing:-.035em;margin:0 0 16px;font-weight:800}
+  .hero h1 em{font-style:normal;color:var(--gold)}
+  .hero p{color:#B9C9D8;max-width:46ch}
+  .hero-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:30px;align-items:center}
+  .machine{background:#0A1727;border:3px solid #2A425C;border-radius:6px;padding:10px}
+  .machine svg{width:100%;height:auto;display:block}
+  .dials{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .dial{flex:1 1 90px;background:#0A1727;border:2px solid #2A425C;border-radius:4px;
+    padding:7px 9px;font-family:var(--mono);font-size:12px;color:#8FA6BC}
+  .dial b{display:block;font-size:19px;color:#fff;font-family:var(--display)}
+  .dial.hot b{color:var(--gold)}
+  .hero input[type=range]{background:#2A425C}
+
+  section{padding:56px 0;border-bottom:var(--edge)}
+  section.tintD{background:linear-gradient(180deg,rgba(108,63,199,.08),rgba(108,63,199,0))}
+  section.tintI{background:linear-gradient(180deg,rgba(18,153,107,.09),rgba(18,153,107,0))}
+  .panel{background:#fff;border:var(--edge);border-radius:5px;box-shadow:var(--hard);padding:22px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .big-say{font-family:var(--display);font-weight:800;font-size:clamp(23px,4vw,38px);
+    line-height:1.08;letter-spacing:-.02em;margin:0 0 16px}
+  .u{background:var(--gold);padding:0 6px;border-radius:3px}
+  .uD{background:var(--slope);color:#fff;padding:0 6px;border-radius:3px}
+  .uI{background:var(--fill);color:#fff;padding:0 6px;border-radius:3px}
+  .formula{font-family:var(--mono);font-weight:600;background:var(--ink);color:#fff;
+    padding:16px 18px;border-radius:4px;font-size:clamp(15px,2.6vw,21px);text-align:center}
+  .formula .g{color:var(--gold)}
+  .formula .d{color:#B79BF0}
+  .formula .i{color:#63D8A8}
+  .frac{display:inline-flex;flex-direction:column;vertical-align:middle;line-height:1.05;margin:0 3px;text-align:center}
+  .frac .top{border-bottom:2px solid currentColor;padding:0 4px 1px}
+  .frac .bot{padding:1px 4px 0}
+
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;background:var(--paper-2);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;
+    background:var(--gold);border:3px solid var(--ink);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--gold);border:3px solid var(--ink);cursor:pointer}
+
+  .readout{font-family:var(--mono);font-size:13px;background:var(--paper-2);border-radius:4px;
+    padding:9px 11px;margin-top:10px;line-height:1.9}
+  .readout b{font-family:var(--display);font-size:15px}
+  .card svg{width:100%;height:auto;display:block;border-radius:4px}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    border:2px solid var(--ink);border-radius:99px;padding:2px 9px;margin-bottom:9px;font-weight:700}
+  .tag.d{background:var(--slope);color:#fff;border-color:var(--slope)}
+  .tag.i{background:var(--fill);color:#fff;border-color:var(--fill)}
+  .tag.g{background:var(--gold)}
+
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:14px;margin-top:6px}
+  th,td{padding:8px;border-bottom:1px solid var(--paper-2);text-align:left}
+  th{font-family:var(--display);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+  td.res{color:var(--slope);font-weight:600}
+  td.resI{color:var(--fill);font-weight:600}
+
+  .steps{border:var(--edge);border-radius:5px;overflow:hidden;background:#fff}
+  .step{display:none;padding:22px}
+  .step.on{display:block;animation:pop .35s ease both}
+  @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .step .work{font-family:var(--mono);font-size:clamp(16px,3.4vw,25px);font-weight:600;text-align:center;
+    padding:20px 6px;background:var(--paper);border-radius:4px;margin-bottom:14px}
+  .stepbar{display:flex;gap:10px;align-items:center;padding:12px 16px;background:var(--ink);color:#fff}
+  .stepbar .count{font-family:var(--mono);font-size:13px;color:#8FA6BC;margin-left:auto}
+  .btn{font-family:var(--display);font-weight:700;font-size:15px;border:2px solid var(--ink);
+    background:var(--gold);color:var(--ink);padding:9px 16px;border-radius:4px;cursor:pointer;
+    transition:transform .12s ease,box-shadow .12s ease}
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+  .btn.ghost{background:transparent;color:#fff;border-color:#3D5670}
+  .btn:focus-visible,input:focus-visible,.quiz button:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+  .dots{display:flex;gap:6px}
+  .dots i{width:9px;height:9px;border-radius:50%;background:#3D5670;display:block}
+  .dots i.on{background:var(--gold)}
+
+  .quiz button{display:block;width:100%;text-align:left;font-family:var(--mono);font-size:15px;
+    padding:11px 13px;margin-bottom:8px;border:2px solid var(--ink);border-radius:4px;background:#fff;cursor:pointer}
+  .quiz button:hover{background:var(--paper-2)}
+  .quiz button.right{background:var(--fill);color:#fff;border-color:var(--fill)}
+  .quiz button.wrong{background:var(--warn);color:#fff;border-color:var(--warn)}
+  .verdict{font-family:var(--mono);font-size:14px;min-height:1.5em;margin-top:4px}
+
+  .trap{background:var(--warn);color:#fff;border:var(--edge);border-radius:5px;padding:20px;box-shadow:var(--hard)}
+  .trap .formula{background:rgba(0,0,0,.28)}
+  .list{list-style:none;padding:0;margin:0}
+  .list li{padding:10px 0 10px 30px;border-bottom:1px dashed var(--ink-soft);position:relative}
+  .list li:last-child{border-bottom:0}
+  .list li::before{content:"→";position:absolute;left:6px;font-family:var(--mono);color:var(--warn);font-weight:600}
+  footer{padding:38px 0 60px;text-align:center;color:var(--ink-soft);font-size:15px}
+
+  @media (max-width:820px){
+    .hero-grid,.two,.three{grid-template-columns:1fr}
+    body{font-size:17px}
+    section{padding:40px 0}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow on-dark">Calculus, explained slowly — part 3</span>
+      <h1>Chop it up.<br>Add it back <em>up.</em></h1>
+      <p class="lead">Calculus is two buttons. <strong style="color:#B79BF0">Derivative</strong> asks "how fast is this changing right now?" <strong style="color:#63D8A8">Integral</strong> asks "how much has piled up in total?"</p>
+      <p>They undo each other, like × and ÷. Slide the handle: two dots on a curve squeeze together until the line joining them stops being a shortcut and becomes the <em>slope at one point</em>.</p>
+    </div>
+    <div>
+      <div class="machine">
+        <svg id="tanSvg" viewBox="0 0 420 300" role="img" aria-label="A curve with two points squeezing together so the line between them becomes the tangent.">
+          <path id="curveT" fill="none" stroke="#E9EFF3" stroke-width="4"/>
+          <line id="secant" stroke="#B79BF0" stroke-width="3"/>
+          <line id="runL" stroke="#8FA6BC" stroke-width="2" stroke-dasharray="4 3"/>
+          <line id="riseL" stroke="#8FA6BC" stroke-width="2" stroke-dasharray="4 3"/>
+          <circle id="pA" r="8" fill="#F2A413" stroke="#0A1727" stroke-width="3"/>
+          <circle id="pB" r="8" fill="#C93C86" stroke="#0A1727" stroke-width="3"/>
+          <text id="hLbl" fill="#8FA6BC" font-family="IBM Plex Mono, monospace" font-size="12"></text>
+        </svg>
+      </div>
+      <div class="dials">
+        <div class="dial">gap (h)<b id="dh">1.000</b>shrinking</div>
+        <div class="dial">rise ÷ run<b id="dslope">3.00</b>average slope</div>
+        <div class="dial hot">heading toward<b>2.00</b>the derivative</div>
+      </div>
+      <label class="mono" style="display:block;font-size:13px;color:#8FA6BC;margin:14px 0 6px">Squeeze the two points together →</label>
+      <input id="hSlider" type="range" min="0" max="100" value="15" aria-label="Shrink the gap h">
+    </div>
+  </div>
+</header>
+
+<!-- ================= 1. BOTH IN ONE PICTURE ================= -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">1 — The whole thing in two sentences</span>
+    <h2>One asks how steep.<br>The other asks how much.</h2>
+
+    <div class="two" style="margin-top:26px">
+      <div class="panel">
+        <span class="tag d">Derivative</span>
+        <h3>Steepness at a single point</h3>
+        <p>Look at any curve. Zoom in far enough on one spot and every curve looks like a straight line. <strong>The derivative is the slope of that line.</strong></p>
+        <p style="margin:0">Real name for it in daily life: <em>rate</em>. Speed, wage per hour, degrees per minute, rupees per litre — all derivatives.</p>
+        <div class="formula" style="margin-top:14px;font-size:16px">
+          <span class="frac"><span class="top d">dy</span><span class="bot d">dx</span></span> = <span class="frac"><span class="top">rise</span><span class="bot">run</span></span>, with the run shrunk to nothing
+        </div>
+      </div>
+      <div class="panel">
+        <span class="tag i">Integral</span>
+        <h3>Total piled up over a stretch</h3>
+        <p>Now look at the space trapped under that curve. <strong>The integral is that area</strong> — found by slicing it into thin strips and adding them.</p>
+        <p style="margin:0">Real name in daily life: <em>total</em>. Distance travelled, money earned, water used, calories eaten.</p>
+        <div class="formula" style="margin-top:14px;font-size:16px">
+          <span class="i">∫</span> f(x) dx = add up (height × tiny width), forever
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:22px;text-align:center">
+      <p class="big-say" style="margin-bottom:8px">Speedometer → odometer.<br>Odometer → speedometer.</p>
+      <p style="margin:0;color:var(--ink-soft)">If you know your speed the whole trip, you can work out the distance (integral). If you know the distance at every moment, you can work out the speed (derivative). Same trip, two readings.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2. DERIVATIVE FEEL ================= -->
+<section class="tintD">
+  <div class="wrap">
+    <span class="eyebrow d">2 — Derivatives</span>
+    <h2>Ride the hill, watch the meter</h2>
+    <p class="lead" style="max-width:62ch">The dot walks over a hill. The little bar sitting on it is the tangent — the direction it's pointing right this second. The meter reads the derivative.</p>
+
+    <div class="two" style="margin-top:24px">
+      <div class="panel card">
+        <svg id="hillSvg" viewBox="0 0 420 260" role="img" aria-label="A dot travelling over a hill with a tangent bar showing the slope.">
+          <rect width="420" height="260" fill="#F5F8FA"/>
+          <line x1="20" y1="140" x2="400" y2="140" stroke="#B9C9D8" stroke-width="2"/>
+          <path id="hill" fill="none" stroke="#11243A" stroke-width="4"/>
+          <line id="tanBar" stroke="#6C3FC7" stroke-width="6" stroke-linecap="round"/>
+          <circle id="hillDot" r="9" fill="#F2A413" stroke="#11243A" stroke-width="3"/>
+          <text id="hillWord" x="210" y="34" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif"
+                font-weight="800" font-size="26" fill="#12996B">CLIMBING</text>
+        </svg>
+        <div class="readout">
+          height right now: <b id="hHt">0.00</b><br>
+          <span style="color:var(--slope)">slope (derivative): <b id="hSl">1.00</b></span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>What the sign is telling you</h3>
+        <ul class="list">
+          <li><strong>Positive derivative</strong> — going up. Prices rising, fever climbing, savings growing.</li>
+          <li><strong>Negative derivative</strong> — going down. Battery draining, car braking, ice melting away.</li>
+          <li><strong>Zero derivative</strong> — flat, for one instant. This is the top of the hill or the bottom of the dip.</li>
+        </ul>
+        <p style="margin-top:16px"><strong>That last one is why derivatives run the world.</strong> Want the cheapest price, the strongest signal, the best angle to throw a ball, the least material for a box? Find where the derivative is zero. That's the peak or the valley.</p>
+        <div class="formula" style="font-size:16px">peak or valley &nbsp;⟺&nbsp; <span class="d">slope = 0</span></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:22px">
+      <div class="two" style="gap:24px">
+        <div>
+          <h3>The only rules you need at first</h3>
+          <table>
+            <tr><th>function</th><th>derivative</th></tr>
+            <tr><td>5 (any number)</td><td class="res">0</td></tr>
+            <tr><td>x</td><td class="res">1</td></tr>
+            <tr><td>x²</td><td class="res">2x</td></tr>
+            <tr><td>x³</td><td class="res">3x²</td></tr>
+            <tr><td>xⁿ</td><td class="res">n·xⁿ⁻¹</td></tr>
+            <tr><td>7x⁴</td><td class="res">28x³</td></tr>
+          </table>
+          <p style="margin-top:14px;font-size:16px"><strong>The power rule:</strong> bring the power down in front, then knock one off the power. A plain number has no slope at all, so it dies.</p>
+        </div>
+        <div>
+          <h3>Where the rule comes from</h3>
+          <p style="font-size:16px">Nobody memorised <span class="mono">2x</span> out of thin air. It falls out of the squeeze you played with at the top of the page:</p>
+          <div class="formula" style="text-align:left;font-size:15px;line-height:2">
+            slope = <span class="frac"><span class="top">(x+h)² − x²</span><span class="bot">h</span></span><br>
+            = <span class="frac"><span class="top">2xh + h²</span><span class="bot">h</span></span> = <span class="d">2x + h</span><br>
+            now let h → 0 &nbsp;⟹&nbsp; <span class="g">2x</span>
+          </div>
+          <p style="margin:14px 0 0;font-size:16px">That's the limits page doing the heavy lifting. A derivative <em>is</em> a limit — the limit of "rise over run" as the run vanishes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. INTEGRAL FEEL ================= -->
+<section class="tintI">
+  <div class="wrap">
+    <span class="eyebrow i">3 — Integrals</span>
+    <h2>Slice the area, add the slices</h2>
+    <p class="lead" style="max-width:62ch">You know the area of a rectangle. That's all an integral uses. Cover the curvy shape with rectangles and add them up — then use more, and thinner, rectangles.</p>
+
+    <div class="two" style="margin-top:24px">
+      <div class="panel card">
+        <svg id="riemSvg" viewBox="0 0 420 260" role="img" aria-label="Rectangles filling the area under a curve, getting thinner as their number increases.">
+          <rect width="420" height="260" fill="#F5F8FA"/>
+          <g id="rects"></g>
+          <path id="rcurve" fill="none" stroke="#11243A" stroke-width="4"/>
+          <line x1="30" y1="230" x2="400" y2="230" stroke="#11243A" stroke-width="3"/>
+          <text x="30" y="250" font-family="IBM Plex Mono, monospace" font-size="12" fill="#3D5670">0</text>
+          <text x="390" y="250" font-family="IBM Plex Mono, monospace" font-size="12" fill="#3D5670">2</text>
+        </svg>
+        <label class="mono" style="display:block;font-size:13px;margin:14px 0 6px">More, thinner rectangles →</label>
+        <input id="nRect" type="range" min="1" max="80" value="4" aria-label="Number of rectangles">
+        <div class="readout">
+          rectangles: <b id="rn">4</b><br>
+          their total area: <b id="ra">3.750</b><br>
+          <span style="color:var(--fill)">heading toward the true area: 2.667</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>What you just did</h3>
+        <p>With 4 fat rectangles the answer is clumsy. With 80 skinny ones it's almost exact. Push the number to infinity and "almost" becomes "exactly" — <strong>that's the integral, and it's a limit again.</strong></p>
+        <div class="formula" style="font-size:15px;text-align:left;line-height:2;margin-bottom:14px">
+          <span class="i">∫</span><sub style="font-size:.7em">0</sub><sup style="font-size:.7em">2</sup> x² dx = <span class="g">8/3 = 2.667</span>
+        </div>
+        <p><strong>Reading the symbols:</strong> the stretched-out S <span class="mono">∫</span> is just an S for "sum". <span class="mono">dx</span> is the sliver of width. So <span class="mono">∫ f(x) dx</span> literally reads <em>"sum of height × width"</em>.</p>
+        <p style="margin:0">The 0 and 2 are where you start and stop slicing. No numbers on it? Then you're being asked for the general formula instead of one number.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4. THE BIG LINK ================= -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow on-dark" style="background:var(--gold)">4 — The punchline of all of calculus</span>
+    <h2>They are the same machine,<br>run in opposite directions</h2>
+    <p class="lead" style="max-width:64ch">Watch one car drive. The <strong style="color:var(--slope)">top graph is the speedometer</strong>. The <strong style="color:var(--fill)">bottom graph is the odometer</strong>. The shaded area piling up on top is <em>exactly</em> the height climbing on the bottom.</p>
+
+    <div class="panel" style="margin-top:24px">
+      <svg id="ftcSvg" viewBox="0 0 420 320" role="img" aria-label="Top graph shows speed with area filling in; bottom graph shows distance rising by the same amount.">
+        <rect width="420" height="320" fill="#F5F8FA"/>
+        <text x="20" y="24" font-family="IBM Plex Mono, monospace" font-size="12" fill="#6C3FC7">SPEED (m/s) — the derivative</text>
+        <path id="areaFill" fill="#6C3FC7" fill-opacity=".25"/>
+        <path id="vCurve" fill="none" stroke="#6C3FC7" stroke-width="4"/>
+        <line x1="30" y1="150" x2="400" y2="150" stroke="#11243A" stroke-width="2"/>
+        <line id="vMark" stroke="#F2A413" stroke-width="2" stroke-dasharray="4 3"/>
+        <circle id="vDot" r="7" fill="#F2A413" stroke="#11243A" stroke-width="3"/>
+
+        <text x="20" y="192" font-family="IBM Plex Mono, monospace" font-size="12" fill="#12996B">DISTANCE (m) — the integral</text>
+        <path id="sCurve" fill="none" stroke="#12996B" stroke-width="4"/>
+        <line x1="30" y1="300" x2="400" y2="300" stroke="#11243A" stroke-width="2"/>
+        <line id="sMark" stroke="#F2A413" stroke-width="2" stroke-dasharray="4 3"/>
+        <circle id="sDot" r="7" fill="#F2A413" stroke="#11243A" stroke-width="3"/>
+      </svg>
+      <div class="two" style="gap:22px;margin-top:14px">
+        <div class="readout" style="margin:0">
+          time: <b id="ftT">0.0</b> s<br>
+          <span style="color:var(--slope)">speed right now: <b id="ftV">6.0</b> m/s</span><br>
+          <span style="color:var(--slope)">= the slope of the green curve below</span>
+        </div>
+        <div class="readout" style="margin:0">
+          <span style="color:var(--fill)">distance so far: <b id="ftS">0.0</b> m</span><br>
+          <span style="color:var(--fill)">= the shaded area above</span><br>
+          the same number, twice
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:22px;text-align:center">
+      <p class="big-say" style="margin-bottom:10px">Differentiate, then integrate,<br>and you're back where you started.</p>
+      <div class="formula">
+        distance <span class="g">—differentiate→</span> <span class="d">speed</span> <span class="g">—integrate→</span> <span class="i">distance</span>
+      </div>
+      <p style="margin:16px 0 0;color:var(--ink-soft)">This is called the Fundamental Theorem of Calculus, which sounds enormous but is just that sentence. It's also the trick that makes integrals possible to actually calculate: instead of adding infinite rectangles, you ask "what would I have to differentiate to get this?" and work backwards.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. DAILY LIFE ================= -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">5 — In your actual day</span>
+    <h2>You already use both</h2>
+
+    <div class="three" style="margin-top:26px">
+      <div class="panel card">
+        <span class="tag i">Integral</span>
+        <h3>Filling a bucket</h3>
+        <svg viewBox="0 0 200 190" role="img" aria-label="Water filling a bucket at a varying rate.">
+          <rect width="200" height="190" fill="#12996B" opacity=".08"/>
+          <rect x="60" y="55" width="80" height="120" fill="none" stroke="#11243A" stroke-width="4" rx="3"/>
+          <rect id="water" x="63" y="172" width="74" height="0" fill="#12996B" opacity=".65"/>
+          <line id="jet" x1="100" y1="12" x2="100" y2="55" stroke="#12996B" stroke-width="6" stroke-linecap="round"/>
+          <text x="100" y="188" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#3D5670">tap on</text>
+        </svg>
+        <div class="readout">
+          flow right now: <b id="wF">0.0</b> L/s <span style="color:var(--slope)">(a derivative)</span><br>
+          water in bucket: <b id="wV">0.0</b> L <span style="color:var(--fill)">(its integral)</span>
+        </div>
+        <p style="margin:12px 0 0;font-size:16px">Your water bill charges the integral. The meter's spinning dial shows the derivative. Turning the tap harder changes the rate, and the total quietly piles up.</p>
+      </div>
+
+      <div class="panel card">
+        <span class="tag d">Derivative</span>
+        <h3>The best price</h3>
+        <svg viewBox="0 0 200 190" role="img" aria-label="A profit curve with a marker sliding to the flat peak.">
+          <rect width="200" height="190" fill="#6C3FC7" opacity=".08"/>
+          <path id="profit" fill="none" stroke="#11243A" stroke-width="4"/>
+          <line x1="20" y1="165" x2="185" y2="165" stroke="#B9C9D8" stroke-width="2"/>
+          <circle id="pdot" r="8" fill="#F2A413" stroke="#11243A" stroke-width="3"/>
+          <line id="ptan" stroke="#6C3FC7" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+        <div class="readout">
+          price: ₹<b id="prP">0</b> &nbsp; profit: ₹<b id="prV">0</b><br>
+          <span style="color:var(--slope)">slope: <b id="prS">0.0</b> — flat means best</span>
+        </div>
+        <p style="margin:12px 0 0;font-size:16px">Charge too little and you earn nothing per sale; charge too much and nobody buys. The sweet spot sits exactly where the profit curve goes flat — where the derivative hits zero.</p>
+      </div>
+
+      <div class="panel card">
+        <span class="tag g">Both</span>
+        <h3>A dose of medicine</h3>
+        <svg viewBox="0 0 200 190" role="img" aria-label="Drug concentration rising then falling, with total exposure shaded.">
+          <rect width="200" height="190" fill="#F2A413" opacity=".1"/>
+          <path id="drugArea" fill="#F2A413" fill-opacity=".35"/>
+          <path id="drug" fill="none" stroke="#11243A" stroke-width="4"/>
+          <line x1="20" y1="160" x2="185" y2="160" stroke="#11243A" stroke-width="2"/>
+          <circle id="ddot" r="7" fill="#C93C86" stroke="#11243A" stroke-width="3"/>
+        </svg>
+        <div class="readout">
+          in your blood now: <b id="dgC">0.0</b> mg/L<br>
+          <span style="color:var(--slope)">changing at: <b id="dgR">0.00</b> per hr</span><br>
+          <span style="color:var(--fill)">total exposure: <b id="dgA">0.0</b></span>
+        </div>
+        <p style="margin:12px 0 0;font-size:16px">Doctors care about the peak (where the derivative is zero — is it too high?) and the shaded total (the integral — how much did the body actually absorb?). Dosing schedules are built on both.</p>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:22px">
+      <h3>Six more, in one line each</h3>
+      <ul class="list">
+        <li><strong>Phone battery.</strong> Percent left is the integral; "3 hours remaining" is computed from the derivative.</li>
+        <li><strong>Netflix buffering.</strong> Download rate is the derivative, the buffer bar is the integral of it.</li>
+        <li><strong>Weather report.</strong> "Rainfall intensity" is a rate; "42 mm fell today" is its integral.</li>
+        <li><strong>Fitness app.</strong> Pace is the derivative of distance; calories burned is the integral of effort.</li>
+        <li><strong>Loan.</strong> Interest rate is a derivative; the total you actually repay is an integral.</li>
+        <li><strong>Speed bump.</strong> The uncomfortable jolt is the derivative <em>of</em> the derivative — acceleration.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 6. ON PAPER ================= -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">6 — Doing it on paper</span>
+    <h2>Forwards, then backwards</h2>
+    <p class="lead" style="max-width:60ch">Same function, both directions. Tap through:</p>
+
+    <div class="steps" style="margin-top:24px">
+      <div class="step on">
+        <div class="work">y = x³</div>
+        <h3>Step 0 — differentiate this</h3>
+        <p style="margin:0">Question being asked: how steep is this curve at any x?</p>
+      </div>
+      <div class="step">
+        <div class="work"><span class="uD">3</span>x³ → 3x<span class="uD">²</span></div>
+        <h3>Step 1 — power rule, in two moves</h3>
+        <p style="margin:0">Bring the 3 down to the front. Knock the power down from 3 to 2. Answer: <span class="mono">dy/dx = 3x²</span>. At x = 2 the slope is 12 — steep.</p>
+      </div>
+      <div class="step">
+        <div class="work">∫ 3x² dx = ?</div>
+        <h3>Step 2 — now go backwards</h3>
+        <p style="margin:0">Integrating asks: <em>what would I have to differentiate to get 3x²?</em> You literally just did it, so you already know.</p>
+      </div>
+      <div class="step">
+        <div class="work">∫ 3x² dx = <span class="uI">x³ + C</span></div>
+        <h3>Step 3 — undo the power rule</h3>
+        <p style="margin:0">Add one to the power, then divide by the new power. That's the derivative's steps in reverse. But what's that <span class="mono">+ C</span> doing there?</p>
+      </div>
+      <div class="step">
+        <div class="work">x³ + 5 &nbsp;·&nbsp; x³ − 90 &nbsp;·&nbsp; x³ &nbsp;→ all give <span class="uD">3x²</span></div>
+        <h3>Step 4 — why there's a "+ C"</h3>
+        <p style="margin:0">Differentiating destroys plain numbers. So going backwards, you can't tell which number was there. <strong>Like knowing every speed on a trip but not what the odometer read when you set off.</strong> C is that unknown starting reading.</p>
+      </div>
+      <div class="step">
+        <div class="work">∫<sub style="font-size:.6em">0</sub><sup style="font-size:.6em">2</sup> 3x² dx = [x³] = 8 − 0 = <span class="u">8</span></div>
+        <h3>Step 5 — with start and stop values, C cancels</h3>
+        <p style="margin:0">Put in the top number, put in the bottom number, subtract. The mystery constant appears twice and wipes itself out. The area under 3x² from 0 to 2 is exactly 8.</p>
+      </div>
+
+      <div class="stepbar">
+        <button class="btn ghost" id="prev">← Back</button>
+        <button class="btn" id="next">Next step →</button>
+        <div class="dots" id="dots" aria-hidden="true"></div>
+        <span class="count" id="count">1 / 6</span>
+      </div>
+    </div>
+
+    <div class="trap" style="margin-top:22px">
+      <h3 style="margin-bottom:12px">⚠ The mistakes everyone makes</h3>
+      <div class="formula" style="margin-bottom:14px">forgetting <span style="color:#FFD37A">+ C</span> &nbsp;·&nbsp; d/dx of a number ≠ the number &nbsp;·&nbsp; area below the axis counts as negative</div>
+      <p style="margin:0 0 10px"><strong>1.</strong> Dropping the <span class="mono">+ C</span> on an indefinite integral. It's free marks, and it's the one thing every teacher hunts for.</p>
+      <p style="margin:0 0 10px"><strong>2.</strong> Thinking the derivative of 7 is 7. A flat line has no steepness at all, so it's 0.</p>
+      <p style="margin:0"><strong>3.</strong> Assuming an integral is always positive. Below the axis it subtracts — reversing your car takes distance <em>off</em> the trip.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 7. QUIZ ================= -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">7 — Your turn</span>
+    <h2>Three questions. No pressure.</h2>
+    <div class="three" style="margin-top:24px">
+      <div class="panel quiz" data-answer="1">
+        <h3>Q1. Differentiate <span class="mono">y = x⁵</span></h3>
+        <button data-i="0">x⁴</button>
+        <button data-i="1">5x⁴</button>
+        <button data-i="2">5x⁶</button>
+        <p class="verdict"></p>
+      </div>
+      <div class="panel quiz" data-answer="2">
+        <h3>Q2. A car holds a steady 4 m/s for 3 seconds. How far did it go?</h3>
+        <p style="font-size:15px;color:var(--ink-soft)">Hint: area of a rectangle under the speed graph.</p>
+        <button data-i="0">4/3 m</button>
+        <button data-i="1">7 m</button>
+        <button data-i="2">12 m</button>
+        <p class="verdict"></p>
+      </div>
+      <div class="panel quiz" data-answer="0">
+        <h3>Q3. At the very top of a ball's flight, its height's derivative is…</h3>
+        <button data-i="0">zero</button>
+        <button data-i="1">at its biggest</button>
+        <button data-i="2">undefined</button>
+        <p class="verdict"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 8. RECAP ================= -->
+<section style="border-bottom:0">
+  <div class="wrap">
+    <span class="eyebrow">8 — Keep only this</span>
+    <h2>The whole subject on one card</h2>
+    <div class="panel" style="margin-top:22px">
+      <ul class="list" style="font-size:19px">
+        <li><strong>A limit</strong> is where something is heading. Everything else is built on it.</li>
+        <li><strong>A derivative</strong> is a rate: rise over run, with the run squeezed to nothing. Slope. Speed. "How fast right now."</li>
+        <li><strong>An integral</strong> is a total: heights times slivers of width, added forever. Area. Distance. "How much altogether."</li>
+        <li><strong>They undo each other</strong> — so you can hop between rate and total whenever you like.</li>
+        <li><strong>The chain rule</strong> is how you handle anything stacked inside anything else along the way.</li>
+      </ul>
+      <div class="formula" style="margin-top:18px;font-size:16px">
+        <span class="d">d/dx</span> asks HOW STEEP &nbsp;&nbsp;·&nbsp;&nbsp; <span class="i">∫ dx</span> asks HOW MUCH &nbsp;&nbsp;·&nbsp;&nbsp; <span class="g">each undoes the other</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>Three pages, one idea: get close, don't quite land, and see what the numbers were heading toward. That's calculus.</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function path(pts){
+    var d = "";
+    for (var i=0;i<pts.length;i++) d += (i?"L":"M") + pts[i][0].toFixed(1) + " " + pts[i][1].toFixed(1) + " ";
+    return d;
+  }
+
+  /* ---------- HERO: secant -> tangent on y = x^2, at a = 1 ---------- */
+  var X0=0, X1=2.6, Y0=0, Y1=6.8;
+  function hx(x){ return 30 + (x-X0)/(X1-X0)*370; }
+  function hy(y){ return 275 - (y-Y0)/(Y1-Y0)*255; }
+  (function(){
+    var pts=[]; for(var i=0;i<=60;i++){ var x=X0+i*(X1-X0)/60; pts.push([hx(x),hy(x*x)]); }
+    document.getElementById("curveT").setAttribute("d", path(pts));
+  })();
+  var hSlider=document.getElementById("hSlider"), secant=document.getElementById("secant"),
+      pA=document.getElementById("pA"), pB=document.getElementById("pB"),
+      runL=document.getElementById("runL"), riseL=document.getElementById("riseL"),
+      hLbl=document.getElementById("hLbl"),
+      dh=document.getElementById("dh"), dslope=document.getElementById("dslope");
+  function drawTangent(){
+    var v=hSlider.value/100;
+    var h = 1.3*Math.pow(0.004/1.3, v);
+    var a=1, fa=a*a, b=a+h, fb=b*b, m=(fb-fa)/h;
+    pA.setAttribute("cx",hx(a)); pA.setAttribute("cy",hy(fa));
+    pB.setAttribute("cx",hx(b)); pB.setAttribute("cy",hy(fb));
+    secant.setAttribute("x1",hx(X0)); secant.setAttribute("y1",hy(fa+m*(X0-a)));
+    secant.setAttribute("x2",hx(X1)); secant.setAttribute("y2",hy(fa+m*(X1-a)));
+    runL.setAttribute("x1",hx(a)); runL.setAttribute("y1",hy(fa));
+    runL.setAttribute("x2",hx(b)); runL.setAttribute("y2",hy(fa));
+    riseL.setAttribute("x1",hx(b)); riseL.setAttribute("y1",hy(fa));
+    riseL.setAttribute("x2",hx(b)); riseL.setAttribute("y2",hy(fb));
+    hLbl.setAttribute("x", hx(b)+8); hLbl.setAttribute("y", hy(fa)+4);
+    hLbl.textContent = "h = " + h.toFixed(3);
+    dh.textContent = h.toFixed(3);
+    dslope.textContent = m.toFixed(2);
+  }
+  hSlider.addEventListener("input", drawTangent); drawTangent();
+
+  /* ---------- RIEMANN rectangles under x^2 on [0,2] ---------- */
+  var nRect=document.getElementById("nRect"), rects=document.getElementById("rects"),
+      rn=document.getElementById("rn"), ra=document.getElementById("ra");
+  function rx(x){ return 30 + x/2*370; }
+  function ry(y){ return 230 - y/4.4*210; }
+  (function(){
+    var pts=[]; for(var i=0;i<=60;i++){ var x=i*2/60; pts.push([rx(x),ry(x*x)]); }
+    document.getElementById("rcurve").setAttribute("d", path(pts));
+  })();
+  function drawRects(){
+    var n=parseInt(nRect.value,10), w=2/n, sum=0, out="";
+    for (var i=0;i<n;i++){
+      var xm=(i+0.5)*w, hgt=xm*xm; sum+=hgt*w;
+      var px=rx(i*w), pw=rx(w)-rx(0), py=ry(hgt);
+      out += '<rect x="'+px.toFixed(1)+'" y="'+py.toFixed(1)+'" width="'+Math.max(1,pw-0.6).toFixed(1)+
+             '" height="'+(230-py).toFixed(1)+'" fill="#12996B" fill-opacity="0.35" stroke="#12996B" stroke-width="1"/>';
+    }
+    rects.innerHTML = out;
+    rn.textContent = n;
+    ra.textContent = sum.toFixed(3);
+  }
+  nRect.addEventListener("input", drawRects); drawRects();
+
+  /* ---------- FTC twin graphs ---------- */
+  var T1=8;
+  function v(t){ return 6 + 4*Math.sin(t); }
+  function s(t){ return 6*t + 4*(1-Math.cos(t)); }
+  function fx(t){ return 30 + t/T1*370; }
+  function fyv(y){ return 150 - y/12*125; }
+  function fys(y){ return 300 - y/60*105; }
+  (function(){
+    var pv=[], ps=[];
+    for (var i=0;i<=120;i++){ var t=i*T1/120; pv.push([fx(t),fyv(v(t))]); ps.push([fx(t),fys(s(t))]); }
+    document.getElementById("vCurve").setAttribute("d", path(pv));
+    document.getElementById("sCurve").setAttribute("d", path(ps));
+  })();
+  var areaFill=document.getElementById("areaFill"), vDot=document.getElementById("vDot"), sDot=document.getElementById("sDot"),
+      vMark=document.getElementById("vMark"), sMark=document.getElementById("sMark"),
+      ftT=document.getElementById("ftT"), ftV=document.getElementById("ftV"), ftS=document.getElementById("ftS");
+
+  /* ---------- hill rider ---------- */
+  function gx(x){ return 20 + x/(2*Math.PI)*380; }
+  function gy(y){ return 140 - y*70; }
+  (function(){
+    var pts=[]; for(var i=0;i<=80;i++){ var x=i*2*Math.PI/80; pts.push([gx(x),gy(Math.sin(x))]); }
+    document.getElementById("hill").setAttribute("d", path(pts));
+  })();
+  var hillDot=document.getElementById("hillDot"), tanBar=document.getElementById("tanBar"),
+      hillWord=document.getElementById("hillWord"), hHt=document.getElementById("hHt"), hSl=document.getElementById("hSl");
+
+  /* ---------- profit curve ---------- */
+  function pfx(x){ return 20 + x/100*165; }
+  function pfy(y){ return 165 - y/2600*130; }
+  function profitAt(p){ return p*(100-p)*0.26*4; }   /* peak at p = 50 */
+  (function(){
+    var pts=[]; for(var i=0;i<=60;i++){ var p=i*100/60; pts.push([pfx(p),pfy(profitAt(p))]); }
+    document.getElementById("profit").setAttribute("d", path(pts));
+  })();
+  var pdot=document.getElementById("pdot"), ptan=document.getElementById("ptan"),
+      prP=document.getElementById("prP"), prV=document.getElementById("prV"), prS=document.getElementById("prS");
+
+  /* ---------- medicine curve ---------- */
+  function dgx(t){ return 20 + t/12*165; }
+  function dgy(c){ return 160 - c/10*130; }
+  function conc(t){ return 14*(Math.exp(-t/6) - Math.exp(-t/1.4)); }
+  (function(){
+    var pts=[]; for(var i=0;i<=70;i++){ var t=i*12/70; pts.push([dgx(t),dgy(conc(t))]); }
+    document.getElementById("drug").setAttribute("d", path(pts));
+  })();
+  var ddot=document.getElementById("ddot"), drugArea=document.getElementById("drugArea"),
+      dgC=document.getElementById("dgC"), dgR=document.getElementById("dgR"), dgA=document.getElementById("dgA");
+
+  /* ---------- bucket ---------- */
+  var water=document.getElementById("water"), jet=document.getElementById("jet"),
+      wF=document.getElementById("wF"), wV=document.getElementById("wV");
+
+  var t0=performance.now(), tt=0;
+  function frame(now){
+    var dt=Math.min((now-t0)/1000,0.05); t0=now;
+    if(!reduce) tt+=dt;
+
+    /* FTC marker */
+    var T = reduce ? 4 : ((tt*0.55) % T1);
+    var ap=[[fx(0),150]];
+    for (var i=0;i<=60;i++){ var q=T*i/60; ap.push([fx(q),fyv(v(q))]); }
+    ap.push([fx(T),150]);
+    areaFill.setAttribute("d", path(ap)+"Z");
+    vDot.setAttribute("cx",fx(T)); vDot.setAttribute("cy",fyv(v(T)));
+    sDot.setAttribute("cx",fx(T)); sDot.setAttribute("cy",fys(s(T)));
+    vMark.setAttribute("x1",fx(T)); vMark.setAttribute("y1",fyv(v(T)));
+    vMark.setAttribute("x2",fx(T)); vMark.setAttribute("y2",150);
+    sMark.setAttribute("x1",fx(T)); sMark.setAttribute("y1",fys(s(T)));
+    sMark.setAttribute("x2",fx(T)); sMark.setAttribute("y2",300);
+    ftT.textContent=T.toFixed(1); ftV.textContent=v(T).toFixed(1); ftS.textContent=s(T).toFixed(1);
+
+    /* hill */
+    var hxv = reduce ? 1.2 : ((tt*0.5) % (2*Math.PI));
+    var yv=Math.sin(hxv), sl=Math.cos(hxv);
+    hillDot.setAttribute("cx",gx(hxv)); hillDot.setAttribute("cy",gy(yv));
+    var dx=26, dy=-sl*70*(dx/(380/(2*Math.PI)));
+    tanBar.setAttribute("x1",gx(hxv)-dx); tanBar.setAttribute("y1",gy(yv)-dy);
+    tanBar.setAttribute("x2",gx(hxv)+dx); tanBar.setAttribute("y2",gy(yv)+dy);
+    hHt.textContent=yv.toFixed(2); hSl.textContent=sl.toFixed(2);
+    if (sl>0.08){ hillWord.textContent="CLIMBING"; hillWord.setAttribute("fill","#12996B"); tanBar.setAttribute("stroke","#12996B"); }
+    else if (sl<-0.08){ hillWord.textContent="DESCENDING"; hillWord.setAttribute("fill","#C93C86"); tanBar.setAttribute("stroke","#C93C86"); }
+    else { hillWord.textContent="FLAT — SLOPE 0"; hillWord.setAttribute("fill","#F2A413"); tanBar.setAttribute("stroke","#F2A413"); }
+
+    /* profit */
+    var pp = reduce ? 50 : (50 + 46*Math.sin(tt*0.4));
+    var pv2=profitAt(pp), ps2=(100-2*pp)*0.26*4;
+    pdot.setAttribute("cx",pfx(pp)); pdot.setAttribute("cy",pfy(pv2));
+    var pdx=22, pdy=-ps2*(130/2600)*(pdx/(165/100));
+    ptan.setAttribute("x1",pfx(pp)-pdx); ptan.setAttribute("y1",pfy(pv2)-pdy);
+    ptan.setAttribute("x2",pfx(pp)+pdx); ptan.setAttribute("y2",pfy(pv2)+pdy);
+    ptan.setAttribute("stroke", Math.abs(ps2)<6 ? "#F2A413" : "#6C3FC7");
+    prP.textContent=pp.toFixed(0); prV.textContent=pv2.toFixed(0); prS.textContent=ps2.toFixed(1);
+
+    /* medicine */
+    var dtm = reduce ? 3 : ((tt*0.8) % 12);
+    var c=conc(dtm), rate=(conc(dtm+0.01)-conc(dtm))/0.01;
+    var total=0; for(var k=0;k<60;k++){ total += conc(dtm*(k+0.5)/60)*(dtm/60); }
+    ddot.setAttribute("cx",dgx(dtm)); ddot.setAttribute("cy",dgy(c));
+    var dap=[[dgx(0),160]];
+    for (var m=0;m<=50;m++){ var q2=dtm*m/50; dap.push([dgx(q2),dgy(conc(q2))]); }
+    dap.push([dgx(dtm),160]);
+    drugArea.setAttribute("d", path(dap)+"Z");
+    dgC.textContent=c.toFixed(1); dgR.textContent=rate.toFixed(2); dgA.textContent=total.toFixed(1);
+
+    /* bucket */
+    var bt = reduce ? 5 : ((tt*0.9) % 14);
+    var flow = 1.2 + 1.0*Math.sin(bt*0.8);
+    var vol = 1.2*bt + 1.25*(1-Math.cos(bt*0.8));
+    var lvl = Math.min(117, vol/20*117);
+    water.setAttribute("y", 172-lvl); water.setAttribute("height", lvl);
+    jet.setAttribute("stroke-width", (2+flow*3).toFixed(1));
+    wF.textContent=flow.toFixed(1); wV.textContent=vol.toFixed(1);
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* ---------- stepper ---------- */
+  var steps=document.querySelectorAll(".step"), idx=0,
+      dots=document.getElementById("dots"), count=document.getElementById("count");
+  for (var i=0;i<steps.length;i++) dots.appendChild(document.createElement("i"));
+  function show(n){
+    idx=Math.max(0,Math.min(steps.length-1,n));
+    for (var i=0;i<steps.length;i++){
+      steps[i].classList.toggle("on", i===idx);
+      dots.children[i].classList.toggle("on", i<=idx);
+    }
+    count.textContent=(idx+1)+" / "+steps.length;
+    document.getElementById("next").textContent = idx===steps.length-1 ? "Start over ↺" : "Next step →";
+  }
+  document.getElementById("next").addEventListener("click",function(){ show(idx===steps.length-1?0:idx+1); });
+  document.getElementById("prev").addEventListener("click",function(){ show(idx-1); });
+  show(0);
+
+  /* ---------- quiz ---------- */
+  var notes=[
+    "Right. Bring the 5 down, drop the power to 4.",
+    "Right. Speed 4 for 3 seconds is a rectangle: 4 × 3 = 12 m. That rectangle IS the integral.",
+    "Right. At the peak it stops rising and hasn't started falling — flat for one instant, so the derivative is 0."
+  ];
+  var quizzes=document.querySelectorAll(".quiz");
+  for (var q=0;q<quizzes.length;q++){
+    (function(box,note){
+      var answer=parseInt(box.getAttribute("data-answer"),10);
+      var verdict=box.querySelector(".verdict"), btns=box.querySelectorAll("button");
+      for (var k=0;k<btns.length;k++){
+        btns[k].addEventListener("click",function(){
+          var pick=parseInt(this.getAttribute("data-i"),10);
+          for (var m=0;m<btns.length;m++) btns[m].classList.remove("right","wrong");
+          if (pick===answer){ this.classList.add("right"); verdict.textContent="✓ "+note; }
+          else { this.classList.add("wrong"); btns[answer].classList.add("right");
+                 verdict.textContent="Not quite — steepness for derivatives, area for integrals. The green one is it."; }
+        });
+      }
+    })(quizzes[q],notes[q]);
+  }
+})();
+</script>
+</body>
+</html>

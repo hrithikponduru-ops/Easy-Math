@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trigonometry made simple — high contrast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root{ --fs:21px; }
+
+  html.light{
+    --bg:#FFFFFF; --panel:#FFFFFF; --text:#0B0B0B; --line:#0B0B0B; --soft:#F2F2F2;
+    --pink:#B3005E; --cyan:#005E78; --lime:#33740A; --sun:#8A5A00; --violet:#5B21B6;
+    --barbg:#0B0B0B; --bartext:#FFFFFF;
+  }
+  html.dark{
+    --bg:#0A0018; --panel:#170035; --text:#FFFFFF; --line:#FFFFFF; --soft:#05000F;
+    --pink:#FF9BCE; --cyan:#7BF0FF; --lime:#CDFF6B; --sun:#FFD84D; --violet:#CDA8FF;
+    --barbg:#FFD84D; --bartext:#0A0018;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;font-size:var(--fs)}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:'Nunito','Segoe UI',system-ui,sans-serif;font-weight:700;
+    font-size:1rem;line-height:1.75;overflow-x:hidden;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:800px;margin:0 auto;padding:0 16px 90px}
+  h1,h2,h3{font-family:'Baloo 2','Trebuchet MS',system-ui,sans-serif;line-height:1.12;margin:0;color:var(--text)}
+  p{margin:.85em 0}
+  strong{color:var(--pink)}
+  em{font-style:normal;text-decoration:underline}
+
+  .sizer{
+    position:sticky;top:0;z-index:20;display:flex;gap:8px;align-items:center;justify-content:center;
+    flex-wrap:wrap;background:var(--barbg);color:var(--bartext);padding:10px;font-size:.82rem;
+    border-bottom:4px solid var(--line);
+  }
+  .sizer button{
+    font-family:'Baloo 2',sans-serif;font-weight:800;background:var(--bartext);color:var(--barbg);
+    border:none;border-radius:12px;padding:8px 16px;font-size:1.05rem;cursor:pointer;
+  }
+  .sizer button:focus-visible{outline:4px solid #B3005E;outline-offset:3px}
+
+  .hero{padding:32px 0 16px;text-align:center}
+  .eyebrow{
+    display:inline-block;background:var(--text);color:var(--bg);font-weight:900;
+    padding:8px 16px;border-radius:10px;font-size:.82rem;text-transform:uppercase;
+  }
+  h1{font-size:2.5rem;font-weight:800;margin:16px 0 10px}
+  .sub{font-size:1.12rem}
+
+  .card{background:var(--panel);border:4px solid var(--line);border-radius:18px;padding:22px;margin:26px 0}
+  .card h2{font-size:1.85rem;margin-bottom:10px}
+  .card h3{font-size:1.3rem;margin-bottom:6px}
+  .tag{
+    display:inline-block;background:var(--text);color:var(--bg);font-weight:900;
+    font-size:.78rem;padding:5px 12px;border-radius:8px;margin-bottom:12px;text-transform:uppercase;
+  }
+  .pink{color:var(--pink)}.cyan{color:var(--cyan)}.lime{color:var(--lime)}
+  .sun{color:var(--sun)}.violet{color:var(--violet)}
+
+  .key{margin:14px 0;padding:14px;background:var(--soft);border:3px solid var(--line);border-radius:14px;font-size:1.02rem}
+  .key span{display:block;margin:8px 0}
+  .swatch{display:inline-block;width:1.1em;height:1.1em;border:2px solid var(--line);border-radius:4px;vertical-align:-.15em;margin-right:.4em}
+
+  .trio{display:grid;grid-template-columns:1fr;gap:16px;margin-top:18px}
+  .fx{border-radius:18px;padding:20px;color:#0B0B0B;border:4px solid #0B0B0B}
+  .fx.s{background:#FFB3DA}.fx.c{background:#A8ECFA}.fx.t{background:#DDFF9E}
+  .fx .word{font-family:'Baloo 2',sans-serif;font-size:2rem;font-weight:800}
+  .fx .frac{display:block;background:#FFFFFF;color:#0B0B0B;border:3px solid #0B0B0B;
+    font-size:1.02rem;padding:10px 14px;border-radius:12px;margin-top:10px}
+  .fx p{margin:.6em 0 0;font-size:1.02rem;color:#0B0B0B}
+
+  .stage{background:#FFFFFF;border:3px solid var(--line);border-radius:16px;padding:10px;margin-top:16px}
+  svg{display:block;width:100%;height:auto}
+
+  .controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:18px}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;flex:1;min-width:170px;height:22px;border-radius:100px;
+    background:linear-gradient(90deg,#FFB3DA,#FFD84D,#A8ECFA);outline:none;border:3px solid var(--line);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:42px;height:42px;border-radius:50%;
+    background:#FFFFFF;border:7px solid #0B0B0B;cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:38px;height:38px;border-radius:50%;background:#FFFFFF;border:7px solid #0B0B0B;cursor:pointer;
+  }
+  input[type=range]:focus-visible{box-shadow:0 0 0 5px #B3005E}
+  .controls button{
+    font-family:'Baloo 2',sans-serif;font-size:1.05rem;font-weight:800;cursor:pointer;
+    background:var(--text);color:var(--bg);border:none;border-radius:14px;padding:12px 24px;
+  }
+  .controls button:focus-visible{outline:4px solid #B3005E;outline-offset:3px}
+
+  .readout{display:grid;grid-template-columns:1fr;gap:12px;margin-top:16px}
+  .readout div{
+    background:var(--soft);border:4px solid currentColor;border-radius:14px;padding:14px;
+    font-size:1.1rem;display:flex;justify-content:space-between;align-items:center;
+  }
+  .readout b{font-size:1.55rem;color:var(--text);font-family:'Baloo 2',sans-serif}
+
+  .life article{background:var(--soft);border:4px solid var(--line);border-radius:18px;padding:20px;margin-top:20px}
+  .maths{
+    background:#FFF6C2;color:#0B0B0B;border:3px solid #0B0B0B;border-radius:12px;
+    padding:14px;margin-top:12px;font-size:1.05rem;font-weight:900;white-space:pre-wrap;
+  }
+  .maths b{color:#B3005E}
+  .emoji{font-size:2.3rem;line-height:1}
+
+  table{width:100%;border-collapse:collapse;font-size:1.02rem;margin-top:12px}
+  th,td{padding:12px 4px;text-align:center;border:3px solid var(--line)}
+  th{background:var(--text);color:var(--bg);font-weight:900}
+  td:first-child{background:#FFF6C2;color:#0B0B0B;font-weight:900}
+
+  .flips{display:grid;grid-template-columns:1fr;gap:14px;margin-top:16px}
+  .flip{background:var(--soft);border:4px solid var(--violet);border-radius:16px;padding:18px}
+  .flip .big{font-family:'Baloo 2',sans-serif;font-size:1.55rem;font-weight:800;color:var(--violet)}
+  .flip .eq{background:#FFFFFF;color:#0B0B0B;border:3px solid #0B0B0B;border-radius:10px;padding:10px;margin-top:8px;font-size:1.02rem}
+  .flip .why{margin:10px 0 0;font-size:.98rem}
+
+  footer{text-align:center;padding-top:30px;font-size:1.02rem}
+
+  @media (min-width:700px){
+    .trio{grid-template-columns:repeat(3,1fr)}
+    .flips{grid-template-columns:repeat(3,1fr)}
+    .readout{grid-template-columns:repeat(3,1fr)}
+    .readout div{flex-direction:column;gap:4px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<div class="sizer">
+  <span>Text</span>
+  <button type="button" id="smaller" aria-label="Make text smaller">A−</button>
+  <button type="button" id="bigger" aria-label="Make text bigger">A+</button>
+  <button type="button" id="theme">Dark background</button>
+</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow">No maths brain required</span>
+    <h1>Trigonometry,<br>made simple</h1>
+    <p class="sub">Three funny words — <span class="pink">sin</span>, <span class="cyan">cos</span>, <span class="lime">tan</span> — are just three ways of dividing one side of a triangle by another. That is the whole secret.</p>
+  </header>
+
+  <section class="card">
+    <span class="tag">Step 1 · the only shape that matters</span>
+    <h2>The right triangle</h2>
+    <p>A right triangle has one perfect square corner (90°). Pick one of the other corners and call it <strong>θ</strong> — "theta" just means <em>the angle I care about</em>. Then the three sides get names.</p>
+    <div class="stage">
+      <svg viewBox="0 0 420 250" role="img" aria-label="Right triangle with the hypotenuse, opposite and adjacent sides labelled">
+        <polygon points="40,200 340,200 340,60" fill="#F2F2F2"/>
+        <line x1="40" y1="200" x2="340" y2="60" stroke="#8A5A00" stroke-width="14" stroke-linecap="round"/>
+        <line x1="340" y1="200" x2="340" y2="60" stroke="#B3005E" stroke-width="14" stroke-linecap="round"/>
+        <line x1="40" y1="200" x2="340" y2="200" stroke="#005E78" stroke-width="14" stroke-linecap="round"/>
+        <rect x="316" y="176" width="24" height="24" fill="none" stroke="#0B0B0B" stroke-width="5"/>
+        <path d="M96,200 A56,56 0 0 0 88,174" fill="none" stroke="#33740A" stroke-width="7"/>
+        <text x="104" y="192" fill="#33740A" font-size="30" font-weight="800" font-family="Baloo 2, sans-serif">θ</text>
+        <text x="118" y="106" fill="#8A5A00" font-size="24" font-weight="800" font-family="Baloo 2, sans-serif">hypotenuse</text>
+        <text x="352" y="136" fill="#B3005E" font-size="24" font-weight="800" font-family="Baloo 2, sans-serif" text-anchor="middle" transform="rotate(90 352 136)">opposite</text>
+        <text x="190" y="238" fill="#005E78" font-size="24" font-weight="800" font-family="Baloo 2, sans-serif" text-anchor="middle">adjacent</text>
+      </svg>
+    </div>
+    <div class="key">
+      <span><i class="swatch" style="background:#8A5A00"></i><span class="sun">Hypotenuse</span> — the slanted side. Always the longest.</span>
+      <span><i class="swatch" style="background:#B3005E"></i><span class="pink">Opposite</span> — the side across the room from θ. It never touches θ.</span>
+      <span><i class="swatch" style="background:#005E78"></i><span class="cyan">Adjacent</span> — the side leaning against θ. "Adjacent" means next door.</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <span class="tag">Step 2 · the magic words</span>
+    <h2>SOH · CAH · TOA</h2>
+    <p>Say it out loud like a spell: <strong>"soh-kah-toa"</strong>. Each word is a fraction. Divide one side by another and the answer is sin, cos or tan.</p>
+    <div class="trio">
+      <div class="fx s">
+        <div class="word">SOH</div>
+        <span class="frac">sin θ = Opposite ÷ Hypotenuse</span>
+        <p>Sine = how far it goes UP.</p>
+      </div>
+      <div class="fx c">
+        <div class="word">CAH</div>
+        <span class="frac">cos θ = Adjacent ÷ Hypotenuse</span>
+        <p>Cosine = how far it goes ACROSS.</p>
+      </div>
+      <div class="fx t">
+        <div class="word">TOA</div>
+        <span class="frac">tan θ = Opposite ÷ Adjacent</span>
+        <p>Tangent = how STEEP it is.</p>
+      </div>
+    </div>
+    <p><strong>Note:</strong> "cosine" and "cos" are the same thing. Cos is just the short way to write it, like "phone" and "telephone".</p>
+  </section>
+
+  <section class="card">
+    <span class="tag">Step 3 · play with it</span>
+    <h2>Drag the angle</h2>
+    <p>The slanted side stays 1 unit long. Open the angle and the triangle stands up taller and gets narrower — and the three numbers change with it. <strong>That is all sin, cos and tan ever do.</strong></p>
+    <div class="stage">
+      <svg id="tri" viewBox="0 0 420 260" role="img" aria-label="Interactive right triangle controlled by the angle slider">
+        <polygon id="triFill" points="" fill="#F2F2F2"/>
+        <line id="adj" stroke="#005E78" stroke-width="14" stroke-linecap="round"/>
+        <line id="opp" stroke="#B3005E" stroke-width="14" stroke-linecap="round"/>
+        <line id="hyp" stroke="#8A5A00" stroke-width="14" stroke-linecap="round"/>
+        <circle id="tip" r="13" fill="#33740A"/>
+        <text id="angLbl" x="78" y="196" fill="#33740A" font-size="28" font-weight="800" font-family="Baloo 2, sans-serif">30°</text>
+      </svg>
+    </div>
+    <div class="controls">
+      <input id="angle" type="range" min="1" max="89" value="30" aria-label="Angle in degrees">
+      <button id="playTri" type="button">Animate</button>
+    </div>
+    <div class="readout">
+      <div class="pink"><span>sin θ</span><b id="sv">0.50</b></div>
+      <div class="cyan"><span>cos θ</span><b id="cv">0.87</b></div>
+      <div class="lime"><span>tan θ</span><b id="tv">0.58</b></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <span class="tag">Step 4 · where waves come from</span>
+    <h2>The spinning wheel</h2>
+    <p>Put the triangle inside a circle and spin it. The <span class="pink">height</span> of the moving dot draws a wave — that wave is <strong>sine</strong>. Its <span class="cyan">side-to-side shadow</span> draws the same wave starting earlier — that is <strong>cosine</strong>. Sound, radio, tides, springs and heartbeats all wiggle exactly like this.</p>
+    <div class="stage">
+      <svg id="wheel" viewBox="0 0 700 340" role="img" aria-label="A point spinning on a circle drawing sine and cosine waves">
+        <circle cx="150" cy="170" r="115" fill="none" stroke="#999999" stroke-width="5"/>
+        <line x1="35" y1="170" x2="265" y2="170" stroke="#CCCCCC" stroke-width="4"/>
+        <line x1="150" y1="55" x2="150" y2="285" stroke="#CCCCCC" stroke-width="4"/>
+        <line id="wCos" stroke="#005E78" stroke-width="12" stroke-linecap="round"/>
+        <line id="wOpp" stroke="#B3005E" stroke-width="12" stroke-linecap="round"/>
+        <line id="wRad" stroke="#8A5A00" stroke-width="9" stroke-linecap="round"/>
+        <circle id="wDot" r="14" fill="#33740A"/>
+        <line x1="320" y1="170" x2="680" y2="170" stroke="#CCCCCC" stroke-width="4"/>
+        <path id="sinPath" fill="none" stroke="#B3005E" stroke-width="7" stroke-linecap="round"/>
+        <path id="cosPath" fill="none" stroke="#005E78" stroke-width="7" stroke-linecap="round"/>
+        <circle id="sinDot" r="11" fill="#B3005E"/>
+        <text x="330" y="52" fill="#B3005E" font-size="22" font-weight="800" font-family="Baloo 2, sans-serif">sine = height</text>
+        <text x="330" y="322" fill="#005E78" font-size="22" font-weight="800" font-family="Baloo 2, sans-serif">cosine = width</text>
+      </svg>
+    </div>
+    <div class="controls">
+      <input id="spin" type="range" min="0" max="360" value="0" aria-label="Spin angle in degrees">
+      <button id="playSpin" type="button">Pause</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <span class="tag">Step 5 · the three lazy cousins</span>
+    <h2>cosec, sec and cot</h2>
+    <p>These scare people for no reason. They are the first three <strong>turned upside down</strong>. Flip the fraction, done.</p>
+    <div class="flips">
+      <div class="flip"><div class="big">cosec θ</div><div class="eq">1 ÷ sin θ = Hyp ÷ Opp</div><p class="why">Sine flipped. Also written csc.</p></div>
+      <div class="flip"><div class="big">sec θ</div><div class="eq">1 ÷ cos θ = Hyp ÷ Adj</div><p class="why">Cosine flipped.</p></div>
+      <div class="flip"><div class="big">cot θ</div><div class="eq">1 ÷ tan θ = Adj ÷ Opp</div><p class="why">Tangent flipped. Roofers use it: how far across for every 1 up?</p></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <span class="tag">Step 6 · why anyone bothers</span>
+    <h2>Real life, real numbers</h2>
+    <p>Trigonometry exists for one reason: <strong>measuring things you cannot reach.</strong> Measure the easy part, and the triangle tells you the rest.</p>
+
+    <div class="life">
+      <article>
+        <div class="emoji">🪜</div>
+        <h3 class="pink">The ladder — use sine</h3>
+        <p>Your ladder is 6 m long and leans at 65°. Will it reach the 5 m window?</p>
+        <div class="stage">
+          <svg viewBox="0 0 300 170" role="img" aria-label="A ladder leaning against a wall below a window">
+            <rect x="228" y="14" width="22" height="136" fill="#8FCEDD"/>
+            <rect x="236" y="50" width="40" height="34" fill="#B3005E"/>
+            <line x1="40" y1="150" x2="276" y2="150" stroke="#33740A" stroke-width="9"/>
+            <line x1="70" y1="150" x2="230" y2="34" stroke="#8A5A00" stroke-width="11" stroke-linecap="round"/>
+            <text x="88" y="140" fill="#0B0B0B" font-size="20" font-weight="800" font-family="Baloo 2, sans-serif">65°</text>
+          </svg>
+        </div>
+        <div class="maths">height = 6 × sin 65°
+= 6 × 0.906 = <b>5.44 m</b>  ✅ it reaches</div>
+      </article>
+
+      <article>
+        <div class="emoji">🌳</div>
+        <h3 class="cyan">The tree — use tangent</h3>
+        <p>You stand 20 m from a tree and tilt your head up 40° to see the top. How tall is it?</p>
+        <div class="stage">
+          <svg viewBox="0 0 300 170" role="img" aria-label="A person measuring a tree using the angle up to its top">
+            <line x1="20" y1="150" x2="280" y2="150" stroke="#33740A" stroke-width="9"/>
+            <line x1="240" y1="150" x2="240" y2="52" stroke="#7A4B1E" stroke-width="16"/>
+            <circle cx="240" cy="46" r="36" fill="#33740A"/>
+            <line x1="45" y1="146" x2="238" y2="50" stroke="#8A5A00" stroke-width="6" stroke-dasharray="10 8"/>
+            <circle cx="38" cy="136" r="14" fill="#B3005E"/>
+            <text x="64" y="140" fill="#0B0B0B" font-size="20" font-weight="800" font-family="Baloo 2, sans-serif">40°</text>
+          </svg>
+        </div>
+        <div class="maths">height = 20 × tan 40°
+= 20 × 0.839 = <b>16.8 m</b></div>
+      </article>
+
+      <article>
+        <div class="emoji">♿</div>
+        <h3 class="lime">The ramp — use sine and cot</h3>
+        <p>A wheelchair ramp must rise 0.5 m at a gentle 5°. How long is the ramp, and how much floor does it use?</p>
+        <div class="stage">
+          <svg viewBox="0 0 300 130" role="img" aria-label="A gently sloped ramp rising to a doorway">
+            <line x1="15" y1="112" x2="285" y2="112" stroke="#999999" stroke-width="6"/>
+            <polygon points="30,112 258,112 258,74" fill="#DDFF9E" stroke="#33740A" stroke-width="7"/>
+            <rect x="258" y="40" width="26" height="72" fill="#8FCEDD"/>
+            <text x="48" y="105" fill="#0B0B0B" font-size="19" font-weight="800" font-family="Baloo 2, sans-serif">5°</text>
+          </svg>
+        </div>
+        <div class="maths">ramp length = 0.5 ÷ sin 5° = <b>5.74 m</b>
+floor used  = 0.5 × cot 5° = <b>5.72 m</b></div>
+      </article>
+
+      <article>
+        <div class="emoji">🎡</div>
+        <h3 class="sun">Ferris wheel &amp; headphones — the wave</h3>
+        <p>A wheel of radius 15 m turns once a minute. Your height above the middle is 15 × sin(angle so far). The same equation describes a speaker cone, a guitar string, the electricity in your wall and the tide at the beach.</p>
+        <div class="maths">after 10 seconds:
+15 × sin 60° = <b>13 m up</b></div>
+      </article>
+
+      <article>
+        <div class="emoji">📱</div>
+        <h3 class="violet">Your phone, all day long</h3>
+        <p>GPS finds you by solving triangles to satellites. Games use sin and cos to move a character in the direction it faces. Maps rotate with sin and cos. Every 3D render does this thousands of times a second.</p>
+        <div class="maths">walking speed 5, heading 30°:
+across = 5 × cos 30° = <b>4.33</b>
+up     = 5 × sin 30° = <b>2.50</b></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="card">
+    <span class="tag">Step 7 · keep this bit</span>
+    <h2>Pocket cheat sheet</h2>
+    <table>
+      <thead><tr><th>angle</th><th>sin</th><th>cos</th><th>tan</th></tr></thead>
+      <tbody>
+        <tr><td>0°</td><td>0</td><td>1</td><td>0</td></tr>
+        <tr><td>30°</td><td>0.50</td><td>0.87</td><td>0.58</td></tr>
+        <tr><td>45°</td><td>0.71</td><td>0.71</td><td>1</td></tr>
+        <tr><td>60°</td><td>0.87</td><td>0.50</td><td>1.73</td></tr>
+        <tr><td>90°</td><td>1</td><td>0</td><td>∞</td></tr>
+      </tbody>
+    </table>
+    <div class="key">
+      <span><strong>1.</strong> Know an angle and one side? Multiply to find another side.</span>
+      <span><strong>2.</strong> Know two sides and want the angle? Use sin⁻¹, cos⁻¹, tan⁻¹ on a calculator.</span>
+      <span><strong>3.</strong> sin and cos never go above 1 or below −1. If yours does, check your work.</span>
+    </div>
+    <p>The one rule worth memorising, true for every angle in the universe: <strong>sin²θ + cos²θ = 1</strong>. It is Pythagoras in a costume.</p>
+  </section>
+
+  <footer>If you understood the ladder, you understood trigonometry. 🎉</footer>
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function rad(d){ return d*Math.PI/180; }
+
+  var size=21, root=document.documentElement;
+  function apply(){ root.style.setProperty('--fs', size+'px'); }
+  document.getElementById('bigger').addEventListener('click',function(){ size=Math.min(36,size+3); apply(); });
+  document.getElementById('smaller').addEventListener('click',function(){ size=Math.max(16,size-3); apply(); });
+
+  var themeBtn=document.getElementById('theme');
+  themeBtn.addEventListener('click',function(){
+    var dark=root.classList.toggle('dark');
+    root.classList.toggle('light',!dark);
+    themeBtn.textContent = dark ? 'Light background' : 'Dark background';
+  });
+
+  var angle=document.getElementById('angle'),
+      hyp=document.getElementById('hyp'), opp=document.getElementById('opp'),
+      adj=document.getElementById('adj'), tip=document.getElementById('tip'),
+      fill=document.getElementById('triFill'), angLbl=document.getElementById('angLbl'),
+      sv=document.getElementById('sv'), cv=document.getElementById('cv'), tv=document.getElementById('tv'),
+      playTri=document.getElementById('playTri');
+  var X=60, Y=210, L=280;
+
+  function drawTri(deg){
+    var a=rad(deg), ex=X+L*Math.cos(a), ey=Y-L*Math.sin(a);
+    adj.setAttribute('x1',X); adj.setAttribute('y1',Y); adj.setAttribute('x2',ex); adj.setAttribute('y2',Y);
+    opp.setAttribute('x1',ex); opp.setAttribute('y1',Y); opp.setAttribute('x2',ex); opp.setAttribute('y2',ey);
+    hyp.setAttribute('x1',X); hyp.setAttribute('y1',Y); hyp.setAttribute('x2',ex); hyp.setAttribute('y2',ey);
+    tip.setAttribute('cx',ex); tip.setAttribute('cy',ey);
+    fill.setAttribute('points', X+','+Y+' '+ex+','+Y+' '+ex+','+ey);
+    angLbl.textContent = Math.round(deg)+'\u00B0';
+    sv.textContent = Math.sin(a).toFixed(2);
+    cv.textContent = Math.cos(a).toFixed(2);
+    tv.textContent = Math.tan(a).toFixed(2);
+  }
+  var triAuto=false, triDir=1;
+  angle.addEventListener('input', function(){ triAuto=false; playTri.textContent='Animate'; drawTri(+angle.value); });
+  playTri.addEventListener('click', function(){ triAuto=!triAuto; playTri.textContent = triAuto?'Stop':'Animate'; });
+
+  var CX=150, CY=170, R=115, spin=document.getElementById('spin'),
+      wRad=document.getElementById('wRad'), wOpp=document.getElementById('wOpp'),
+      wCos=document.getElementById('wCos'), wDot=document.getElementById('wDot'),
+      sinPath=document.getElementById('sinPath'), cosPath=document.getElementById('cosPath'),
+      sinDot=document.getElementById('sinDot'), playSpin=document.getElementById('playSpin');
+  var GX=330, GW=340, AMP=95;
+
+  (function(){
+    var s='', c='';
+    for(var d=0; d<=360; d+=3){
+      var x=GX+GW*(d/360), ys=CY-AMP*Math.sin(rad(d)), yc=CY-AMP*Math.cos(rad(d));
+      s += (d===0?'M':'L')+x.toFixed(1)+' '+ys.toFixed(1);
+      c += (d===0?'M':'L')+x.toFixed(1)+' '+yc.toFixed(1);
+    }
+    sinPath.setAttribute('d',s); cosPath.setAttribute('d',c);
+  })();
+
+  function drawWheel(deg){
+    var a=rad(deg), px=CX+R*Math.cos(a), py=CY-R*Math.sin(a);
+    wRad.setAttribute('x1',CX); wRad.setAttribute('y1',CY); wRad.setAttribute('x2',px); wRad.setAttribute('y2',py);
+    wCos.setAttribute('x1',CX); wCos.setAttribute('y1',CY); wCos.setAttribute('x2',px); wCos.setAttribute('y2',CY);
+    wOpp.setAttribute('x1',px); wOpp.setAttribute('y1',CY); wOpp.setAttribute('x2',px); wOpp.setAttribute('y2',py);
+    wDot.setAttribute('cx',px); wDot.setAttribute('cy',py);
+    var gx=GX+GW*((((deg%360)+360)%360)/360);
+    sinDot.setAttribute('cx',gx); sinDot.setAttribute('cy',CY-AMP*Math.sin(a));
+  }
+  var spinAuto=!reduce, theta=0;
+  playSpin.textContent = spinAuto?'Pause':'Play';
+  spin.addEventListener('input', function(){ spinAuto=false; playSpin.textContent='Play'; theta=+spin.value; drawWheel(theta); });
+  playSpin.addEventListener('click', function(){ spinAuto=!spinAuto; playSpin.textContent = spinAuto?'Pause':'Play'; });
+
+  var last=0;
+  function loop(t){
+    var dt = last ? (t-last)/1000 : 0; last=t;
+    if(spinAuto){ theta=(theta+40*dt)%360; spin.value=Math.round(theta); drawWheel(theta); }
+    if(triAuto){
+      var v=+angle.value + triDir*20*dt;
+      if(v>=89){v=89;triDir=-1;} if(v<=1){v=1;triDir=1;}
+      angle.value=v; drawTri(v);
+    }
+    requestAnimationFrame(loop);
+  }
+  apply(); drawTri(30); drawWheel(0); requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

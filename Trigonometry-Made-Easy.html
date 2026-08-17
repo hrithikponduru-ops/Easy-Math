@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="A bright, interactive, beginner-friendly guide to sine, cosine, tangent, and cotangent.">
+  <title>Trigonometry Made Easy</title>
+  <style>
+    :root{--ink:#10103b;--navy:#17164c;--pink:#ff3cac;--yellow:#ffe600;--cyan:#00e5ff;--lime:#74ff00;--orange:#ff7a00;--purple:#8d45ff;--paper:#fffdf4;--white:#fff;--shadow:8px 8px 0 var(--ink)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);font-family:ui-rounded,"Arial Rounded MT Bold",system-ui,sans-serif;background:var(--paper);line-height:1.55;overflow-x:hidden}
+    button,input{font:inherit}a{color:inherit}.skip{position:absolute;left:-999px;top:8px;background:var(--yellow);padding:.7rem 1rem;border:3px solid var(--ink);z-index:20}.skip:focus{left:8px}
+    .hero{min-height:92vh;display:grid;place-items:center;padding:6rem 1.2rem 4rem;position:relative;isolation:isolate;background:radial-gradient(circle at 20% 20%,var(--pink) 0 16%,transparent 16.5%),radial-gradient(circle at 82% 22%,var(--yellow) 0 12%,transparent 12.5%),radial-gradient(circle at 78% 80%,var(--cyan) 0 17%,transparent 17.5%),linear-gradient(135deg,var(--purple),#5b38ff 48%,var(--pink));overflow:hidden}
+    .blob{position:absolute;border:4px solid var(--ink);z-index:-1;animation:float 5s ease-in-out infinite}.b1{width:90px;height:90px;background:var(--lime);border-radius:55% 45% 65% 35%;left:7%;top:60%;animation-delay:-1s}.b2{width:70px;height:70px;background:var(--orange);transform:rotate(20deg);right:8%;top:48%;animation-delay:-2s}.b3{width:55px;height:55px;background:var(--cyan);border-radius:50%;left:48%;top:8%;animation-delay:-3s}
+    .hero-card{max-width:1000px;background:rgba(255,255,255,.94);border:5px solid var(--ink);box-shadow:14px 14px 0 var(--ink);padding:clamp(1.4rem,4vw,3.2rem);transform:rotate(-1deg);text-align:center}.eyebrow{display:inline-block;background:var(--lime);border:3px solid var(--ink);padding:.35rem .75rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;transform:rotate(2deg)}
+    h1{font-size:clamp(3rem,9vw,7rem);line-height:.88;margin:.8rem 0;text-transform:uppercase;letter-spacing:-.06em}.rainbow{background:linear-gradient(90deg,var(--pink),var(--orange),#e6c700,#30c900,#00aee9,var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:2px var(--ink);filter:drop-shadow(4px 4px 0 var(--ink))}
+    .lead{font-size:clamp(1.1rem,2.2vw,1.55rem);max-width:760px;margin:1.5rem auto}.cta{display:inline-block;background:var(--yellow);border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:.8rem 1.2rem;text-decoration:none;font-weight:1000;text-transform:uppercase;transition:.18s transform,.18s box-shadow}.cta:hover,.cta:focus-visible{transform:translate(4px,4px);box-shadow:2px 2px 0 var(--ink)}
+    main{display:block}.band{padding:clamp(3.5rem,8vw,7rem) 1.2rem}.wrap{width:min(1120px,100%);margin:auto}.title{font-size:clamp(2.2rem,6vw,4.8rem);line-height:1;margin:0 0 .7rem;text-transform:uppercase;letter-spacing:-.04em}.subtitle{font-size:1.2rem;max-width:760px;margin:0 0 2rem}.pink{background:var(--pink)}.cyan{background:var(--cyan)}.yellow{background:var(--yellow)}.purple{background:var(--purple);color:white}.lime{background:var(--lime)}
+    .idea{display:grid;grid-template-columns:1fr 1.15fr;gap:2rem;align-items:center}.speech,.panel{background:var(--white);border:4px solid var(--ink);box-shadow:var(--shadow);padding:clamp(1.2rem,3vw,2rem)}.speech p{font-size:1.2rem}.bigline{font-size:clamp(1.5rem,4vw,2.8rem);line-height:1.15;font-weight:1000}.marker{background:linear-gradient(transparent 48%,var(--yellow) 48% 91%,transparent 91%)}
+    .triangle-card{background:var(--navy);border:4px solid var(--ink);box-shadow:var(--shadow);padding:1rem;color:white}.triangle-card svg{display:block;width:100%;height:auto}.pulse{animation:pulse 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+    .recipe{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2rem}.ratio{background:white;border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:1.25rem;position:relative;overflow:hidden}.ratio h3{font-size:2rem;margin:0}.ratio .full{font-size:.9rem;font-weight:800;text-transform:uppercase}.formula{display:block;margin:1rem 0;background:var(--navy);color:white;padding:.8rem;text-align:center;border:3px solid var(--ink);font-size:1.15rem}.ratio:nth-child(1){border-top:14px solid var(--pink)}.ratio:nth-child(2){border-top:14px solid var(--cyan)}.ratio:nth-child(3){border-top:14px solid var(--yellow)}.ratio:nth-child(4){border-top:14px solid var(--lime)}
+    .memory{margin-top:2rem;background:var(--yellow);border:4px dashed var(--ink);padding:1.25rem;text-align:center;font-size:clamp(1.3rem,3vw,2rem);font-weight:1000}.memory span{display:inline-block;animation:wiggle 1.2s ease-in-out infinite}.memory span:nth-child(2){animation-delay:.15s}.memory span:nth-child(3){animation-delay:.3s}
+    .lab{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:start}.control{background:white;border:4px solid var(--ink);box-shadow:var(--shadow);padding:1.5rem}.control label{font-weight:1000;font-size:1.25rem}.control input{width:100%;accent-color:var(--pink);margin:1rem 0}.angle-read{display:inline-block;background:var(--yellow);border:3px solid var(--ink);padding:.3rem .7rem;font-size:1.5rem;font-weight:1000}.values{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}.value{border:3px solid var(--ink);padding:.75rem;background:var(--paper)}.value b{font-size:1.45rem;display:block}.value:last-child{grid-column:1/-1;background:var(--lime)}.plain{background:var(--navy);color:white;border:4px solid var(--ink);padding:1.2rem;margin-top:1rem}.plain strong{color:var(--yellow)}
+    .examples{display:grid;grid-template-columns:repeat(2,1fr);gap:1.4rem}.example{background:white;color:var(--ink);border:4px solid var(--ink);box-shadow:var(--shadow);padding:1.2rem;display:grid;grid-template-columns:140px 1fr;gap:1rem;align-items:center}.example h3{font-size:1.7rem;margin:.1rem 0}.pic{width:140px;height:140px;border:3px solid var(--ink);background:var(--cyan);display:grid;place-items:center;overflow:hidden}.pic svg{width:100%;height:100%}.tag{display:inline-block;background:var(--yellow);border:2px solid var(--ink);padding:.15rem .5rem;font-weight:900}
+    .choose{display:flex;flex-wrap:wrap;gap:.8rem;margin:1rem 0}.choice{border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);background:white;padding:.65rem .9rem;font-weight:900;cursor:pointer}.choice:hover,.choice:focus-visible{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}.choice.correct{background:var(--lime)}.choice.wrong{background:#ff6b6b;color:#24104e}.feedback{min-height:3rem;font-weight:900;font-size:1.1rem;background:white;border:3px solid var(--ink);padding:.7rem}
+    .cheat{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}.rule{background:white;border:4px solid var(--ink);padding:1rem;box-shadow:6px 6px 0 var(--ink)}.rule b{font-size:1.3rem}.final{padding:4rem 1.2rem;text-align:center;background:var(--navy);color:white}.final h2{font-size:clamp(2rem,6vw,4rem);margin:.2rem}.final .cta{color:var(--ink)}
+    @keyframes float{50%{transform:translateY(-18px) rotate(8deg)}}@keyframes pulse{50%{transform:scale(1.06);opacity:.8}}@keyframes wiggle{25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
+    @media(max-width:850px){.idea,.lab{grid-template-columns:1fr}.recipe{grid-template-columns:1fr 1fr}.example{grid-template-columns:110px 1fr}.pic{width:110px;height:110px}}@media(max-width:560px){.recipe,.examples,.cheat{grid-template-columns:1fr}.example{grid-template-columns:1fr}.pic{width:100%;height:170px}.hero-card{box-shadow:8px 8px 0 var(--ink)}.rainbow{-webkit-text-stroke:1px var(--ink)}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#learn">Skip to lesson</a>
+  <header class="hero">
+    <i class="blob b1" aria-hidden="true"></i><i class="blob b2" aria-hidden="true"></i><i class="blob b3" aria-hidden="true"></i>
+    <div class="hero-card">
+      <span class="eyebrow">No scary math language</span>
+      <h1>Trig, but<br><span class="rainbow">actually easy</span></h1>
+      <p class="lead">Sine, cosine, tangent and cotangent are just <strong>ways to compare the sides of a right triangle.</strong> That is the whole big secret.</p>
+      <a class="cta" href="#learn">Show me the triangle ↓</a>
+    </div>
+  </header>
+
+  <main id="learn">
+    <section class="band pink">
+      <div class="wrap idea">
+        <div class="speech">
+          <p class="bigline">First: meet the only triangle we need.</p>
+          <p>A <span class="marker"><strong>right triangle</strong></span> has one square corner: exactly <strong>90°</strong>.</p>
+          <p>Pick the angle you care about, called <strong>θ</strong> (“theta”). Then name the three sides from that angle.</p>
+          <p>Important: <strong>opposite</strong> and <strong>adjacent</strong> can switch when you choose a different angle. The hypotenuse never switches.</p>
+        </div>
+        <div class="triangle-card">
+          <svg viewBox="0 0 560 390" role="img" aria-label="Right triangle with hypotenuse, opposite and adjacent sides labeled">
+            <defs><filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <polygon points="80,320 480,320 480,65" fill="#322c78" stroke="#fff" stroke-width="7"/>
+            <line x1="80" y1="320" x2="480" y2="65" stroke="#ffe600" stroke-width="13" filter="url(#glow)" class="pulse"/>
+            <line x1="480" y1="320" x2="480" y2="65" stroke="#ff3cac" stroke-width="13"/>
+            <line x1="80" y1="320" x2="480" y2="320" stroke="#00e5ff" stroke-width="13"/>
+            <path d="M440 320v-40h40" fill="none" stroke="#74ff00" stroke-width="6"/>
+            <path d="M140 320 A60 60 0 0 0 131 287" fill="none" stroke="#74ff00" stroke-width="7"/>
+            <text x="145" y="302" fill="#74ff00" font-size="30" font-weight="900">θ</text>
+            <text x="245" y="182" fill="#ffe600" font-size="23" font-weight="900" transform="rotate(-32 245 182)">HYPOTENUSE = longest</text>
+            <text x="493" y="210" fill="#ff78c5" font-size="23" font-weight="900">OPPOSITE</text>
+            <text x="210" y="355" fill="#59efff" font-size="23" font-weight="900">ADJACENT = beside θ</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="band cyan">
+      <div class="wrap">
+        <h2 class="title">Four tiny recipes</h2>
+        <p class="subtitle">A trig “function” is just a division recipe. Divide one side length by another.</p>
+        <div class="recipe">
+          <article class="ratio"><div class="full">Sine</div><h3>SIN</h3><span class="formula">opposite ÷ hypotenuse</span><p>How much the triangle goes <strong>up</strong> compared with its longest side.</p></article>
+          <article class="ratio"><div class="full">Cosine</div><h3>COS</h3><span class="formula">adjacent ÷ hypotenuse</span><p>How much the triangle goes <strong>across</strong> compared with its longest side.</p></article>
+          <article class="ratio"><div class="full">Tangent</div><h3>TAN</h3><span class="formula">opposite ÷ adjacent</span><p>How <strong>steep</strong> it is: rise divided by run.</p></article>
+          <article class="ratio"><div class="full">Cotangent</div><h3>COT</h3><span class="formula">adjacent ÷ opposite</span><p>Tangent flipped upside down. So <strong>cot = 1 ÷ tan</strong>.</p></article>
+        </div>
+        <div class="memory" aria-label="Memory trick: SOH CAH TOA"><span>SOH:</span> Sin = Opp/Hyp &nbsp; <span>CAH:</span> Cos = Adj/Hyp &nbsp; <span>TOA:</span> Tan = Opp/Adj</div>
+      </div>
+    </section>
+
+    <section class="band yellow">
+      <div class="wrap">
+        <h2 class="title">Move the angle. Watch everything change.</h2>
+        <p class="subtitle">The bottom side stays 10 units long. Drag the slider and the triangle grows taller.</p>
+        <div class="lab">
+          <div class="triangle-card">
+            <svg id="liveTriangle" viewBox="0 0 600 410" role="img" aria-label="Interactive right triangle">
+              <polygon id="livePoly" points="70,350 530,350 530,188" fill="#322c78" stroke="white" stroke-width="6"/>
+              <line x1="70" y1="350" x2="530" y2="350" stroke="#00e5ff" stroke-width="13"/>
+              <line id="oppLine" x1="530" y1="350" x2="530" y2="188" stroke="#ff3cac" stroke-width="13"/>
+              <line id="hypLine" x1="70" y1="350" x2="530" y2="188" stroke="#ffe600" stroke-width="13"/>
+              <path d="M490 350v-38h40" fill="none" stroke="#74ff00" stroke-width="6"/>
+              <path id="angleArc" d="M135 350 A65 65 0 0 0 132 327" fill="none" stroke="#74ff00" stroke-width="7"/>
+              <text id="angleText" x="145" y="337" fill="#74ff00" font-size="27" font-weight="900">20°</text>
+              <text x="270" y="383" fill="#59efff" font-size="24" font-weight="900">adjacent = 10</text>
+              <text id="heightText" x="540" y="275" fill="#ff78c5" font-size="23" font-weight="900">opposite = 3.6</text>
+            </svg>
+          </div>
+          <div class="control">
+            <label for="angle">Your angle: <output class="angle-read" id="angleOut">20°</output></label>
+            <input id="angle" type="range" min="10" max="70" value="20" step="1" aria-describedby="labHelp">
+            <p id="labHelp">Small angle = gentle slope. Big angle = steep slope.</p>
+            <div class="values" aria-live="polite">
+              <div class="value">sin θ<b id="sinVal">0.342</b></div>
+              <div class="value">cos θ<b id="cosVal">0.940</b></div>
+              <div class="value">tan θ<b id="tanVal">0.364</b></div>
+              <div class="value">cot θ<b id="cotVal">2.747</b></div>
+              <div class="value">triangle height<b id="heightVal">3.64 units</b></div>
+            </div>
+            <p class="plain"><strong>Notice:</strong> as the angle grows, tan grows fast. That is why tangent is great for measuring steepness.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band purple">
+      <div class="wrap">
+        <h2 class="title">Where would I use this?</h2>
+        <p class="subtitle">Anywhere an angle, a distance, and a height meet.</p>
+        <div class="examples">
+          <article class="example"><div class="pic"><svg viewBox="0 0 140 140" aria-hidden="true"><rect width="140" height="140" fill="#00e5ff"/><rect x="101" y="18" width="23" height="112" fill="#8d45ff" stroke="#10103b" stroke-width="4"/><line x1="20" y1="125" x2="104" y2="27" stroke="#ffe600" stroke-width="9"/><line x1="37" y1="106" x2="48" y2="118" stroke="#10103b" stroke-width="3"/><circle cx="20" cy="125" r="7" fill="#ff3cac"/></svg></div><div><span class="tag">SIN</span><h3>Ladder safety</h3><p>You know the ladder length and its angle. Use <strong>sin</strong> to find how high it reaches.</p><p><strong>height = ladder × sin(angle)</strong></p></div></article>
+          <article class="example"><div class="pic"><svg viewBox="0 0 140 140" aria-hidden="true"><rect width="140" height="140" fill="#ffe600"/><circle cx="25" cy="25" r="14" fill="#ff7a00" stroke="#10103b" stroke-width="4"/><rect x="92" y="44" width="13" height="76" fill="#8a4b22" stroke="#10103b" stroke-width="3"/><circle cx="98" cy="38" r="29" fill="#74ff00" stroke="#10103b" stroke-width="4"/><polygon points="98,120 25,120 98,67" fill="#ff3cac" opacity=".72"/><line x1="25" y1="120" x2="98" y2="120" stroke="#10103b" stroke-width="4"/></svg></div><div><span class="tag">TAN</span><h3>Tree from its shadow</h3><p>Measure the shadow and the sun angle. Use <strong>tan</strong> to find the tree height.</p><p><strong>height = shadow × tan(angle)</strong></p></div></article>
+          <article class="example"><div class="pic"><svg viewBox="0 0 140 140" aria-hidden="true"><rect width="140" height="140" fill="#ff3cac"/><rect x="18" y="78" width="104" height="45" fill="#fff" stroke="#10103b" stroke-width="4"/><polygon points="12,79 70,33 128,79" fill="#ffe600" stroke="#10103b" stroke-width="5"/><line x1="70" y1="33" x2="70" y2="79" stroke="#10103b" stroke-width="3" stroke-dasharray="5"/></svg></div><div><span class="tag">TAN / COS</span><h3>Roofs and ramps</h3><p>Builders use <strong>tan</strong> for slope and <strong>cos</strong> to turn a slanted beam length into horizontal distance.</p><p>Useful for safe ramps and roofs that drain rain.</p></div></article>
+          <article class="example"><div class="pic"><svg viewBox="0 0 140 140" aria-hidden="true"><rect width="140" height="140" fill="#74ff00"/><path d="M5 75 Q38 48 70 75 T135 75" fill="none" stroke="#00aee9" stroke-width="14"/><path d="M72 22l25 93-27-14-28 14z" fill="#fff" stroke="#10103b" stroke-width="4"/><circle cx="72" cy="72" r="7" fill="#ff3cac"/></svg></div><div><span class="tag">SIN + COS</span><h3>Maps and navigation</h3><p>Split a diagonal trip into north/south and east/west parts.</p><p><strong>vertical = distance × sin(angle)</strong><br><strong>horizontal = distance × cos(angle)</strong></p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="band lime">
+      <div class="wrap lab">
+        <div>
+          <h2 class="title">Tiny quiz</h2>
+          <p class="subtitle">You know the side beside the angle and want the side across from it. Which ratio connects opposite and adjacent?</p>
+          <div class="choose" role="group" aria-label="Quiz answers">
+            <button class="choice" data-answer="sin">SIN</button><button class="choice" data-answer="cos">COS</button><button class="choice" data-answer="tan">TAN</button><button class="choice" data-answer="cot">COT</button>
+          </div>
+          <div class="feedback" id="feedback" aria-live="polite">Pick one. Hint: remember TOA.</div>
+        </div>
+        <div class="panel">
+          <p class="bigline">The two-step way to solve almost any beginner problem</p>
+          <ol><li><strong>Circle what you know and what you want.</strong></li><li><strong>Pick the recipe containing those two sides:</strong> SOH, CAH, or TOA.</li></ol>
+          <p>Example: adjacent = 10, angle = 30°, want opposite.<br><strong>tan(30°) = opposite ÷ 10</strong><br>So opposite = 10 × tan(30°) ≈ <strong>5.77</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band cyan">
+      <div class="wrap">
+        <h2 class="title">Keep this cheat sheet</h2>
+        <div class="cheat">
+          <div class="rule"><b>Need height from a slanted length?</b><br>Try sine: opposite = hypotenuse × sin(angle).</div>
+          <div class="rule"><b>Need horizontal from a slanted length?</b><br>Try cosine: adjacent = hypotenuse × cos(angle).</div>
+          <div class="rule"><b>Need height from ground distance?</b><br>Try tangent: opposite = adjacent × tan(angle).</div>
+          <div class="rule"><b>Need ground distance from height?</b><br>Try cotangent: adjacent = opposite × cot(angle).</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="final"><h2>You now know trig. Seriously.</h2><p>It is just side-length division in a right triangle.</p><a class="cta" href="#learn">Review the triangle ↑</a></footer>
+  <script>
+    const angle=document.querySelector('#angle');
+    const $=id=>document.getElementById(id);
+    function updateTriangle(){
+      const deg=Number(angle.value),rad=deg*Math.PI/180,tan=Math.tan(rad),sin=Math.sin(rad),cos=Math.cos(rad),cot=1/tan;
+      const x1=70,x2=530,y=350,width=x2-x1,rawHeight=width*tan,height=Math.min(280,rawHeight),top=y-height;
+      $('livePoly').setAttribute('points',x1+','+y+' '+x2+','+y+' '+x2+','+top);
+      $('oppLine').setAttribute('y2',top);$('hypLine').setAttribute('y2',top);
+      $('heightText').setAttribute('y',Math.max(75,top+height/2));$('heightText').textContent='opposite = '+(10*tan).toFixed(1);
+      $('angleOut').textContent=deg+'°';$('angleText').textContent=deg+'°';
+      $('sinVal').textContent=sin.toFixed(3);$('cosVal').textContent=cos.toFixed(3);$('tanVal').textContent=tan.toFixed(3);$('cotVal').textContent=cot.toFixed(3);$('heightVal').textContent=(10*tan).toFixed(2)+' units';
+      const r=65,a=-rad,sx=x1+r,sy=y,ex=x1+r*Math.cos(a),ey=y+r*Math.sin(a);
+      $('angleArc').setAttribute('d','M '+sx+' '+sy+' A '+r+' '+r+' 0 0 0 '+ex+' '+ey);
+    }
+    angle.addEventListener('input',updateTriangle);updateTriangle();
+    document.querySelectorAll('.choice').forEach(btn=>btn.addEventListener('click',()=>{
+      document.querySelectorAll('.choice').forEach(b=>b.classList.remove('correct','wrong'));
+      const right=btn.dataset.answer==='tan';btn.classList.add(right?'correct':'wrong');
+      $('feedback').textContent=right?'Yes! TAN = opposite ÷ adjacent. TOA wins. 🎉':'Not this one. You need opposite and adjacent: think TOA.';
+    }));
+  </script>
+</body>
+</html>

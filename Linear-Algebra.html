@@ -1,0 +1,1971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linear Algebra, explained with pictures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..900,0..100,0..1&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   Colour is used as grammar, not decoration:
+   blue  = the first thing        pink = the second thing
+   teal  = the answer             amber = "look here right now"
+   ============================================================ */
+:root{
+  --paper:#E9EDF5;
+  --card:#FFFFFF;
+  --ink:#141D34;
+  --soft:#54628A;
+  --rule:#D3DBE9;
+  --blue:#2F5BEA;
+  --pink:#DD3178;
+  --teal:#0B9484;
+  --amber:#E09106;
+  --blue-wash:#E7EDFE;
+  --pink-wash:#FCE7F0;
+  --teal-wash:#E0F4F1;
+  --amber-wash:#FDF2DC;
+  --shadow:0 1px 0 rgba(20,29,52,.04), 0 10px 30px -18px rgba(20,29,52,.45);
+  --gap:clamp(20px,4vw,40px);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{
+  margin:0;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(rgba(20,29,52,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(20,29,52,.055) 1px,transparent 1px);
+  background-size:28px 28px;
+  font-family:"Work Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+
+h1,h2,h3{
+  font-family:"Fraunces","Georgia",serif;
+  font-variation-settings:"SOFT" 40,"WONK" 1;
+  line-height:1.05;
+  letter-spacing:-.015em;
+  margin:0;
+}
+
+.wrap{width:min(1080px,100% - 2*var(--gap));margin-inline:auto}
+
+/* ---------- skip link ---------- */
+.skip{position:absolute;left:-9999px;top:0;background:var(--ink);color:#fff;padding:10px 16px;z-index:99}
+.skip:focus{left:8px;top:8px}
+
+/* ---------- hero ---------- */
+.hero{padding:clamp(48px,8vw,96px) 0 clamp(32px,5vw,56px)}
+.hero__grid{display:grid;gap:clamp(28px,4vw,52px);grid-template-columns:1fr}
+@media(min-width:900px){.hero__grid{grid-template-columns:1.05fr .95fr;align-items:center}}
+
+.eyebrow{
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--soft);margin:0 0 18px;
+}
+.eyebrow b{color:var(--pink);font-weight:700}
+
+.hero h1{font-size:clamp(38px,7.2vw,68px);font-weight:700;max-width:14ch}
+.hero h1 em{font-style:italic;color:var(--blue)}
+.hero__sub{font-size:clamp(17px,2.2vw,20px);color:var(--soft);max-width:46ch;margin:22px 0 0}
+
+.legend{
+  margin-top:30px;display:flex;flex-wrap:wrap;gap:10px;
+  padding:0;list-style:none;
+}
+.legend li{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:500;color:var(--soft);
+  background:var(--card);border:1px solid var(--rule);border-radius:999px;
+  padding:6px 14px 6px 8px;
+}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}
+.dot--b{background:var(--blue)}.dot--p{background:var(--pink)}.dot--t{background:var(--teal)}
+
+.hero__fig{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:18px;box-shadow:var(--shadow)}
+
+/* ---------- sticky index ---------- */
+.index{
+  position:sticky;top:0;z-index:20;
+  background:rgba(233,237,245,.86);
+  backdrop-filter:blur(10px);
+  border-block:1px solid var(--rule);
+}
+.index__inner{display:flex;gap:6px;overflow-x:auto;padding:10px 0;scrollbar-width:thin}
+.index a{
+  flex:none;text-decoration:none;color:var(--soft);
+  font-size:13px;font-weight:500;white-space:nowrap;
+  padding:7px 13px;border-radius:999px;border:1px solid transparent;
+}
+.index a:hover{color:var(--ink);background:var(--card);border-color:var(--rule)}
+.index a.on{color:#fff;background:var(--ink);border-color:var(--ink)}
+.index a i{font-family:"JetBrains Mono",monospace;font-style:normal;opacity:.55;margin-right:6px}
+
+/* ---------- generic blocks ---------- */
+.section{padding:clamp(40px,6vw,72px) 0}
+.lede{max-width:62ch;color:var(--soft);font-size:18px}
+
+.card{
+  background:var(--card);border:1px solid var(--rule);border-radius:6px;
+  box-shadow:var(--shadow);padding:clamp(20px,3.4vw,34px);
+}
+
+/* ---------- entries ---------- */
+.entry{margin-bottom:clamp(28px,4vw,48px);scroll-margin-top:76px}
+.entry__head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.entry__num{
+  font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:700;
+  color:var(--pink);letter-spacing:.06em;text-transform:uppercase;
+}
+.entry h2{font-size:clamp(27px,4vw,38px);font-weight:700}
+.entry__one{color:var(--soft);font-size:18px;margin:0 0 22px;max-width:60ch}
+
+.formula{
+  font-family:"JetBrains Mono",monospace;
+  background:var(--ink);color:#fff;border-radius:5px;
+  padding:16px 20px;font-size:clamp(15px,2.4vw,19px);
+  overflow-x:auto;white-space:nowrap;letter-spacing:.01em;
+}
+.formula .hl{color:#8FB0FF}
+.formula .hl2{color:#FF8FBB}
+
+.split{display:grid;gap:clamp(20px,3vw,34px);grid-template-columns:1fr;margin-top:24px}
+@media(min-width:880px){.split{grid-template-columns:1fr 1.08fr;align-items:start}}
+
+.prose p{margin:0 0 15px}
+.prose p:last-child{margin-bottom:0}
+.prose h3{font-size:19px;font-weight:600;margin:26px 0 10px;font-variation-settings:"SOFT" 30,"WONK" 0}
+.prose h3:first-child{margin-top:0}
+
+figure{margin:0}
+figcaption{font-size:13.5px;color:var(--soft);margin-top:12px;line-height:1.5}
+
+/* ---------- callouts ---------- */
+.note{
+  border-left:3px solid var(--blue);background:var(--blue-wash);
+  padding:14px 18px;border-radius:0 5px 5px 0;font-size:15.5px;margin:20px 0 0;
+}
+.note--real{border-color:var(--teal);background:var(--teal-wash)}
+.note--warn{border-color:var(--amber);background:var(--amber-wash)}
+.note b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  font-family:"JetBrains Mono",monospace;margin-bottom:5px;color:var(--soft)}
+
+.work{
+  margin-top:24px;border:1px dashed var(--rule);border-radius:5px;
+  padding:16px 20px;background:#FBFCFE;
+}
+.work b{display:block;font-family:"JetBrains Mono",monospace;font-size:12px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:10px}
+.work code{
+  font-family:"JetBrains Mono",monospace;font-size:15px;display:block;
+  white-space:pre-wrap;line-height:1.9;
+}
+.work .ans{color:var(--teal);font-weight:700}
+
+/* ---------- diagrams ---------- */
+.dia{display:block;width:100%;height:auto}
+.dia text{font-family:"JetBrains Mono",ui-monospace,monospace;fill:var(--ink)}
+.dia .lbl{font-family:"Work Sans",sans-serif;font-size:13px;fill:var(--soft)}
+.dia .tile{fill:#fff;stroke:var(--rule);stroke-width:1.5}
+.dia .num{font-size:19px;font-weight:500;text-anchor:middle;dominant-baseline:central}
+.dia .cap{font-size:13px;text-anchor:middle;fill:var(--soft);font-family:"Work Sans",sans-serif}
+
+.controls{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+button{
+  font-family:"Work Sans",sans-serif;font-size:14px;font-weight:600;
+  padding:9px 18px;border-radius:999px;border:1px solid var(--ink);
+  background:var(--ink);color:#fff;cursor:pointer;
+}
+button.ghost{background:transparent;color:var(--ink)}
+button:hover{opacity:.86}
+button:focus-visible,a:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+/* ---------- recap ---------- */
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);
+  font-family:"JetBrains Mono",monospace;font-weight:500}
+td:first-child{font-weight:600;white-space:nowrap}
+td code{font-family:"JetBrains Mono",monospace;font-size:14px;color:var(--blue)}
+.scroller{overflow-x:auto}
+
+footer{padding:44px 0 64px;color:var(--soft);font-size:14px;border-top:1px solid var(--rule);margin-top:40px}
+
+/* ---------- mini card galleries ---------- */
+.cards{display:grid;gap:14px;grid-template-columns:1fr;margin-top:22px}
+@media(min-width:640px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.cards{grid-template-columns:repeat(3,1fr)}}
+.mini{
+  border:1px solid var(--rule);border-radius:5px;padding:15px 17px 13px;
+  background:#FBFCFE;display:flex;flex-direction:column;gap:7px;
+}
+.mini__top{display:flex;align-items:baseline;gap:9px}
+.mini__n{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;color:var(--pink);flex:none}
+.mini h4{margin:0;font-family:"Work Sans",sans-serif;font-size:16px;font-weight:600;line-height:1.25}
+.mini__val{
+  font-family:"JetBrains Mono",monospace;font-size:19px;font-weight:700;
+  color:var(--blue);line-height:1.3;overflow-wrap:anywhere;
+}
+.mini__slots{font-size:12px;letter-spacing:.03em;color:var(--soft);text-transform:uppercase;
+  font-family:"JetBrains Mono",monospace;line-height:1.5}
+.mini p{margin:0;font-size:14.5px;line-height:1.5}
+.mini .use{
+  margin-top:auto;padding-top:9px;border-top:1px dashed var(--rule);
+  font-size:13.5px;color:var(--teal);line-height:1.45;
+}
+.mini .use b{display:block;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--soft);font-weight:500;margin-bottom:3px}
+.swatch{width:100%;height:26px;border-radius:3px;border:1px solid var(--rule)}
+.grouphead{
+  display:flex;align-items:center;gap:14px;margin:34px 0 0;
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--soft);
+}
+.grouphead::after{content:"";flex:1;height:1px;background:var(--rule)}
+.grouphead:first-of-type{margin-top:24px}
+
+/* ---------- reveal ---------- */
+.rise{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+.rise.seen{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#start">Skip to the first idea</a>
+
+<!-- shared SVG defs: arrowheads + graph paper -->
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+    <pattern id="gp30" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M30 0 H0 V30" fill="none" stroke="#D3DBE9" stroke-width="1"/>
+    </pattern>
+    <pattern id="gp40" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0 H0 V40" fill="none" stroke="#D3DBE9" stroke-width="1"/>
+    </pattern>
+    <marker id="ahInk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#141D34"/></marker>
+    <marker id="ahBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#2F5BEA"/></marker>
+    <marker id="ahPink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#DD3178"/></marker>
+    <marker id="ahTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#0B9484"/></marker>
+    <marker id="ahAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#E09106"/></marker>
+    <marker id="ahSoft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#54628A"/></marker>
+  </defs>
+</svg>
+
+<!-- ============================ HERO ============================ -->
+<header class="hero">
+  <div class="wrap hero__grid">
+    <div>
+      <p class="eyebrow">Cheat sheet 1 &mdash; <b>eight things</b>, no jargon</p>
+      <h1>Linear algebra, <em>explained with pictures</em></h1>
+      <p class="hero__sub">Every symbol on that black-and-white card is really a very simple idea about lists of numbers and grids of numbers. Here is each one, drawn out, with an example you could explain to a friend at dinner.</p>
+      <ul class="legend">
+        <li><span class="dot dot--b"></span>the first thing</li>
+        <li><span class="dot dot--p"></span>the second thing</li>
+        <li><span class="dot dot--t"></span>the answer</li>
+      </ul>
+    </div>
+
+    <div class="hero__fig">
+      <svg class="dia" viewBox="0 0 460 300" role="img" aria-labelledby="heroT heroD">
+        <title id="heroT">A grid of numbers reshaping an arrow</title>
+        <desc id="heroD">A blue arrow on graph paper is transformed by a two-by-two grid of numbers into a longer teal arrow pointing in a new direction.</desc>
+        <rect x="40" y="40" width="240" height="200" fill="url(#gp40)"/>
+        <line x1="40" y1="240" x2="300" y2="240" stroke="#141D34" stroke-width="1.5" marker-end="url(#ahInk)"/>
+        <line x1="40" y1="240" x2="40" y2="30" stroke="#141D34" stroke-width="1.5" marker-end="url(#ahInk)"/>
+        <line x1="40" y1="240" x2="120" y2="160" stroke="#2F5BEA" stroke-width="4" marker-end="url(#ahBlue)"/>
+        <line x1="40" y1="240" x2="240" y2="80" stroke="#0B9484" stroke-width="4" marker-end="url(#ahTeal)"/>
+        <text class="cap" x="96" y="196" fill="#2F5BEA">before</text>
+        <text class="cap" x="222" y="106" fill="#0B9484">after</text>
+        <g transform="translate(330,110)">
+          <rect class="tile" x="0" y="0" width="46" height="46"/>
+          <rect class="tile" x="46" y="0" width="46" height="46"/>
+          <rect class="tile" x="0" y="46" width="46" height="46"/>
+          <rect class="tile" x="46" y="46" width="46" height="46"/>
+          <text class="num" x="23" y="23">2</text><text class="num" x="69" y="23">1</text>
+          <text class="num" x="23" y="69">0</text><text class="num" x="69" y="69">2</text>
+          <text class="cap" x="46" y="-14">the grid that did it</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ============================ INDEX ============================ -->
+<nav class="index" aria-label="The eight items">
+  <div class="wrap index__inner">
+    <a href="#vector"><i>01</i>Vector</a>
+    <a href="#dot"><i>02</i>Dot product</a>
+    <a href="#matmul"><i>03</i>Matrix multiplication</a>
+    <a href="#transpose"><i>04</i>Transpose</a>
+    <a href="#inverse"><i>05</i>Inverse</a>
+    <a href="#det"><i>06</i>Determinant</a>
+    <a href="#trace"><i>07</i>Trace</a>
+    <a href="#eigen"><i>08</i>Eigenvalue equation</a>
+    <a href="#eigen-deep"><i>+</i>Eigen deep dive</a>
+    <a href="#values"><i>18</i>Values</a>
+    <a href="#vectors"><i>18</i>Vectors</a>
+  </div>
+</nav>
+
+<!-- ============================ PRIMER ============================ -->
+<main>
+<section class="section" id="start">
+  <div class="wrap">
+    <div class="card rise">
+      <p class="eyebrow" style="margin-bottom:10px">Read this first &mdash; 30 seconds</p>
+      <h2 style="font-size:clamp(24px,3.4vw,32px);font-weight:700">Everything here is built from three things</h2>
+      <p class="lede" style="margin-top:14px">A number on its own. A list of numbers. A grid of numbers. That's the whole cast of characters. The eight items below are just different ways of poking at lists and grids.</p>
+      <svg class="dia" style="margin-top:26px;max-width:760px" viewBox="0 0 700 190" role="img" aria-labelledby="prT prD">
+        <title id="prT">Number, vector and matrix compared</title>
+        <desc id="prD">A single tile holding the number seven, a column of three tiles, and a three by three grid of tiles.</desc>
+        <g transform="translate(20,52)">
+          <rect class="tile" x="0" y="0" width="52" height="52"/>
+          <text class="num" x="26" y="26">7</text>
+          <text class="cap" x="26" y="-18" font-weight="700" fill="#141D34">Number</text>
+          <text class="cap" x="26" y="76">one value</text>
+          <text class="cap" x="26" y="96">"scalar"</text>
+        </g>
+        <g transform="translate(210,52)">
+          <rect class="tile" x="0" y="0" width="52" height="52"/>
+          <rect class="tile" x="0" y="52" width="52" height="52"/>
+          <text class="num" x="26" y="26" fill="#2F5BEA">4</text>
+          <text class="num" x="26" y="78" fill="#2F5BEA">3</text>
+          <text class="cap" x="26" y="-18" font-weight="700" fill="#141D34">Vector</text>
+          <text class="cap" x="26" y="128">a list, in order</text>
+        </g>
+        <g transform="translate(420,26)">
+          <rect class="tile" x="0" y="0" width="52" height="52"/><rect class="tile" x="52" y="0" width="52" height="52"/><rect class="tile" x="104" y="0" width="52" height="52"/>
+          <rect class="tile" x="0" y="52" width="52" height="52"/><rect class="tile" x="52" y="52" width="52" height="52"/><rect class="tile" x="104" y="52" width="52" height="52"/>
+          <rect class="tile" x="0" y="104" width="52" height="52"/><rect class="tile" x="52" y="104" width="52" height="52"/><rect class="tile" x="104" y="104" width="52" height="52"/>
+          <text class="num" x="26" y="26">2</text><text class="num" x="78" y="26">9</text><text class="num" x="130" y="26">4</text>
+          <text class="num" x="26" y="78">7</text><text class="num" x="78" y="78">5</text><text class="num" x="130" y="78">3</text>
+          <text class="num" x="26" y="130">6</text><text class="num" x="78" y="130">1</text><text class="num" x="130" y="130">8</text>
+          <text class="cap" x="78" y="-14" font-weight="700" fill="#141D34">Matrix</text>
+          <text class="cap" x="78" y="180">a table: rows &times; columns</text>
+        </g>
+        <line x1="110" y1="78" x2="185" y2="78" stroke="#54628A" stroke-width="1.5" stroke-dasharray="5 5" marker-end="url(#ahSoft)"/>
+        <line x1="300" y1="78" x2="395" y2="78" stroke="#54628A" stroke-width="1.5" stroke-dasharray="5 5" marker-end="url(#ahSoft)"/>
+      </svg>
+      <div class="note note--warn">
+        <b>The one habit to build</b>
+        Always read a grid as <em>rows first, then columns</em>. A<sub>ij</sub> means "row i, column j" &mdash; like naming a seat in a cinema: row 3, seat 2. Nearly every mistake in this whole subject is a swapped row and column.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 01 VECTOR ============================ -->
+<section class="section" id="vector" style="padding-top:0">
+  <div class="wrap">
+    <article class="entry card rise">
+      <div class="entry__head"><span class="entry__num">01</span><h2>Vector</h2></div>
+      <p class="entry__one">A list of numbers written in a fixed order. That's it.</p>
+
+      <div class="formula">v = [ v<span class="hl">₁</span>, v<span class="hl">₂</span>, &hellip;, v<span class="hl">ₙ</span> ]&nbsp;&nbsp;&isin;&nbsp;&#8477;&#8319;&nbsp;&nbsp;&nbsp;<span style="opacity:.55">(written as a tall column)</span></div>
+
+      <div class="split">
+        <div class="prose">
+          <h3>In plain words</h3>
+          <p>A vector is a set of measurements kept together, always in the same order. The order is the whole point: <strong>[4, 3] is not the same as [3, 4]</strong>, in the same way that "4 spoons of flour, 3 of sugar" is not the same cake as "3 of flour, 4 of sugar".</p>
+          <p>The scary bit <strong>&isin; &#8477;&#8319;</strong> just reads as: "it's a list of <em>n</em> ordinary numbers." &#8477;&#178; is a list of 2 numbers, which is exactly a point on a page. &#8477;&#179; is a point in a room.</p>
+          <h3>Why people draw it as an arrow</h3>
+          <p>If your list is [4, 3], you can walk 4 steps right and 3 steps up. Draw an arrow from where you started to where you ended and you've drawn the vector. The list and the arrow are the same information wearing different clothes.</p>
+
+          <div class="note note--real">
+            <b>Everyday example</b>
+            Your coffee order is a vector: <strong>[2 shots, 1 sugar, 300 ml milk]</strong>. The barista only needs the numbers because the order of the slots is agreed in advance. Change the order and you get a very odd drink.
+          </div>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 520 280" role="img" aria-labelledby="vT vD">
+            <title id="vT">The vector 4, 3 drawn as an arrow on graph paper</title>
+            <desc id="vD">Graph paper with an arrow from the origin going four squares right and three squares up, next to the same numbers stacked in a column.</desc>
+            <rect x="60" y="60" width="210" height="150" fill="url(#gp30)"/>
+            <line x1="60" y1="210" x2="292" y2="210" stroke="#141D34" stroke-width="1.5" marker-end="url(#ahInk)"/>
+            <line x1="60" y1="210" x2="60" y2="46" stroke="#141D34" stroke-width="1.5" marker-end="url(#ahInk)"/>
+            <line x1="60" y1="210" x2="180" y2="210" stroke="#DD3178" stroke-width="3" stroke-dasharray="6 5"/>
+            <line x1="180" y1="210" x2="180" y2="120" stroke="#E09106" stroke-width="3" stroke-dasharray="6 5"/>
+            <line x1="60" y1="210" x2="180" y2="120" stroke="#2F5BEA" stroke-width="4" marker-end="url(#ahBlue)"/>
+            <circle cx="180" cy="120" r="5" fill="#2F5BEA"/>
+            <text class="cap" x="120" y="232" fill="#DD3178">4 across</text>
+            <text class="cap" x="216" y="168" fill="#E09106">3 up</text>
+            <text class="cap" x="128" y="146" fill="#2F5BEA" font-weight="700">v</text>
+            <text class="cap" x="52" y="230" text-anchor="end">start</text>
+
+            <g transform="translate(360,110)">
+              <path d="M-14 -26 h-8 v88 h8" fill="none" stroke="#141D34" stroke-width="2.5"/>
+              <path d="M60 -26 h8 v88 h-8" fill="none" stroke="#141D34" stroke-width="2.5"/>
+              <rect class="tile" x="0" y="-22" width="46" height="40" fill="#FCE7F0" stroke="#DD3178"/>
+              <rect class="tile" x="0" y="18" width="46" height="40" fill="#FDF2DC" stroke="#E09106"/>
+              <text class="num" x="23" y="-2">4</text>
+              <text class="num" x="23" y="38">3</text>
+              <text class="cap" x="27" y="-44">same thing, as a list</text>
+              <text class="cap" x="27" y="84">v &isin; &#8477;&#178;</text>
+            </g>
+          </svg>
+          <figcaption>The arrow and the column hold identical information. Pink is the across-step, amber is the up-step.</figcaption>
+        </figure>
+      </div>
+
+      <div class="work">
+        <b>Worked example</b>
+        <code>v = [4, 3]
+
+How long is the arrow?   Pythagoras on the dashed triangle:
+   &radic;(4&sup2; + 3&sup2;) = &radic;(16 + 9) = &radic;25 = <span class="ans">5</span>
+
+Add two vectors? Add matching slots:
+   [4, 3] + [1, 2] = [4+1, 3+2] = <span class="ans">[5, 5]</span></code>
+      </div>
+
+      <div class="note note--warn">
+        <b>Common mix-up</b>
+        A vector is not "a number". You can't compare two vectors with &lt; or &gt;, and you can only add vectors of the same length. [4, 3] + [1, 2, 9] is meaningless &mdash; like adding a two-item shopping list to a three-item one slot by slot.
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ 02 DOT PRODUCT ============================ -->
+<section class="section" id="dot" style="padding-top:0">
+  <div class="wrap">
+    <article class="entry card rise">
+      <div class="entry__head"><span class="entry__num">02</span><h2>Dot product</h2></div>
+      <p class="entry__one">Multiply the matching pairs, then add everything up. Two lists go in, <em>one single number</em> comes out.</p>
+
+      <div class="formula">a<sup>T</sup>b = &Sigma; <span class="hl">a</span><sub>i</sub><span class="hl2">b</span><sub>i</sub> = <span class="hl">a</span><sub>1</sub><span class="hl2">b</span><sub>1</sub> + <span class="hl">a</span><sub>2</sub><span class="hl2">b</span><sub>2</sub> + &hellip; + <span class="hl">a</span><sub>n</sub><span class="hl2">b</span><sub>n</sub></div>
+
+      <div class="split">
+        <div class="prose">
+          <h3>In plain words</h3>
+          <p>Line the two lists up side by side. Multiply the first with the first, the second with the second, and so on down the line. Then add all those products together. One number falls out at the end.</p>
+          <p>The <strong>&Sigma;</strong> symbol is just the word "add up" written in Greek, and <strong>i = 1 to n</strong> underneath it means "do it for every slot from the first to the last".</p>
+          <p>The little <strong>T</strong> in a<sup>T</sup>b is bookkeeping: it tips the first column on its side so the two lists face each other and can be paired off. It does not change any of the numbers.</p>
+
+          <div class="note note--real">
+            <b>Everyday example</b>
+            This is a shop receipt. <strong>Quantities</strong> [2, 5, 1] dotted with <strong>prices</strong> [£3, £2, £10] gives your total bill. Nobody thinks of a receipt as advanced maths, but the till is doing a dot product every time.
+          </div>
+
+          <h3>The other thing it tells you</h3>
+          <p>A dot product also measures how much two lists <em>agree</em>. Big positive number: the two arrows point roughly the same way. Zero: they're at right angles, completely unrelated. Negative: they point opposite ways. This one fact is how recommendation engines decide two films are similar.</p>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 540 310" role="img" aria-labelledby="dT dD">
+            <title id="dT">Dot product of quantities and prices giving a total bill</title>
+            <desc id="dD">Two rows of three tiles are paired vertically, multiplied to give six, ten and ten, and these are added to make twenty six.</desc>
+            <text class="cap" x="60" y="24" text-anchor="end" fill="#2F5BEA" font-weight="700">how many</text>
+            <text class="cap" x="60" y="94" text-anchor="end" fill="#DD3178" font-weight="700">price each</text>
+
+            <g>
+              <rect class="tile" x="90" y="6" width="80" height="46" fill="#E7EDFE" stroke="#2F5BEA"/>
+              <rect class="tile" x="220" y="6" width="80" height="46" fill="#E7EDFE" stroke="#2F5BEA"/>
+              <rect class="tile" x="350" y="6" width="80" height="46" fill="#E7EDFE" stroke="#2F5BEA"/>
+              <text class="num" x="130" y="29">2</text><text class="num" x="260" y="29">5</text><text class="num" x="390" y="29">1</text>
+            </g>
+            <g>
+              <rect class="tile" x="90" y="76" width="80" height="46" fill="#FCE7F0" stroke="#DD3178"/>
+              <rect class="tile" x="220" y="76" width="80" height="46" fill="#FCE7F0" stroke="#DD3178"/>
+              <rect class="tile" x="350" y="76" width="80" height="46" fill="#FCE7F0" stroke="#DD3178"/>
+              <text class="num" x="130" y="99">3</text><text class="num" x="260" y="99">2</text><text class="num" x="390" y="99">10</text>
+            </g>
+
+            <g stroke="#54628A" stroke-width="1.5" stroke-dasharray="4 4">
+              <line x1="130" y1="52" x2="130" y2="76"/><line x1="260" y1="52" x2="260" y2="76"/><line x1="390" y1="52" x2="390" y2="76"/>
+            </g>
+            <g class="cap" fill="#54628A">
+              <text x="150" y="70">&times;</text><text x="280" y="70">&times;</text><text x="410" y="70">&times;</text>
+            </g>
+
+            <g stroke="#54628A" stroke-width="1.5">
+              <line x1="130" y1="122" x2="130" y2="160" marker-end="url(#ahSoft)"/>
+              <line x1="260" y1="122" x2="260" y2="160" marker-end="url(#ahSoft)"/>
+              <line x1="390" y1="122" x2="390" y2="160" marker-end="url(#ahSoft)"/>
+            </g>
+
+            <g>
+              <rect class="tile" x="90" y="166" width="80" height="46"/>
+              <rect class="tile" x="220" y="166" width="80" height="46"/>
+              <rect class="tile" x="350" y="166" width="80" height="46"/>
+              <text class="num" x="130" y="189">6</text><text class="num" x="260" y="189">10</text><text class="num" x="390" y="189">10</text>
+              <text class="cap" x="195" y="196">+</text><text class="cap" x="325" y="196">+</text>
+            </g>
+
+            <line x1="260" y1="212" x2="260" y2="244" stroke="#0B9484" stroke-width="2" marker-end="url(#ahTeal)"/>
+            <rect class="tile" x="200" y="250" width="120" height="50" fill="#E0F4F1" stroke="#0B9484" stroke-width="2"/>
+            <text class="num" x="260" y="275" fill="#0B9484" font-weight="700">26</text>
+            <text class="cap" x="340" y="280" text-anchor="start" fill="#0B9484">the whole bill</text>
+          </svg>
+          <figcaption>Pair, multiply, add. Three multiplications and two additions turn six numbers into one.</figcaption>
+        </figure>
+      </div>
+
+      <div class="work">
+        <b>Worked example</b>
+        <code>a = [2, 5, 1]   (items in the basket)
+b = [3, 2, 10]  (price of each item)
+
+a&middot;b = (2&times;3) + (5&times;2) + (1&times;10)
+    = 6 + 10 + 10
+    = <span class="ans">26</span></code>
+      </div>
+
+      <div class="note note--warn">
+        <b>Common mix-up</b>
+        Both lists must be exactly the same length &mdash; no leftovers allowed. And the answer is a plain number, not a list. If your answer still looks like a list, you forgot to add the products together.
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ 03 MATRIX MULTIPLICATION ============================ -->
+<section class="section" id="matmul" style="padding-top:0">
+  <div class="wrap">
+    <article class="entry card rise">
+      <div class="entry__head"><span class="entry__num">03</span><h2>Matrix multiplication</h2></div>
+      <p class="entry__one">Do a dot product for every row-meets-column pairing. Nothing new to learn &mdash; just item 02, repeated in an organised way.</p>
+
+      <div class="formula">(AB)<sub>ij</sub> = &Sigma; <span class="hl">A</span><sub>ik</sub><span class="hl2">B</span><sub>kj</sub>&nbsp;&nbsp;&nbsp;<span style="opacity:.55">&larr; "the cell in row i, column j is row i of A dotted with column j of B"</span></div>
+
+      <div class="split">
+        <div class="prose">
+          <h3>In plain words</h3>
+          <p>To fill in the cell sitting in <strong>row 2, column 1</strong> of the answer, you take <strong>row 2 of A</strong> and <strong>column 1 of B</strong>, and do a dot product on them. Repeat for every cell. That's the entire operation.</p>
+          <p>The letter <strong>k</strong> in the formula is just the finger that slides along the row and down the column at the same time.</p>
+
+          <h3>The size rule</h3>
+          <p>An <strong>m&times;n</strong> matrix times an <strong>n&times;p</strong> matrix gives an <strong>m&times;p</strong> matrix. The two inner numbers must match, because a row of A has to be exactly as long as a column of B for the pairing to work. If they don't match, the multiplication simply doesn't exist.</p>
+
+          <div class="note note--real">
+            <b>Everyday example</b>
+            Rows of A = two recipes, columns = how much flour and butter each needs. Columns of B = two shops, rows = what flour and butter cost there. Multiply and you get a small table: <em>what each recipe costs at each shop</em>. Four answers from one operation.
+          </div>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 500 400" role="img" aria-labelledby="mT mD">
+            <title id="mT">Matrix multiplication laid out as a grid</title>
+            <desc id="mD">Matrix B sits above the answer, matrix A sits to its left, and each answer cell lies where a row of A crosses a column of B.</desc>
+
+            <text class="cap" x="290" y="20" text-anchor="start" fill="#DD3178" font-weight="700">B &mdash; second</text>
+            <rect class="tile" x="290" y="30" width="60" height="60"/><rect class="tile" x="350" y="30" width="60" height="60"/>
+            <rect class="tile" x="290" y="90" width="60" height="60"/><rect class="tile" x="350" y="90" width="60" height="60"/>
+            <rect id="mm-col" x="290" y="30" width="60" height="120" fill="#FCE7F0" opacity="0"/>
+            <g>
+              <text class="num" x="320" y="60">5</text><text class="num" x="380" y="60">6</text>
+              <text class="num" x="320" y="120">7</text><text class="num" x="380" y="120">8</text>
+            </g>
+
+            <text class="cap" x="110" y="200" text-anchor="start" fill="#2F5BEA" font-weight="700">A &mdash; first</text>
+            <rect class="tile" x="110" y="210" width="65" height="60"/><rect class="tile" x="175" y="210" width="65" height="60"/>
+            <rect class="tile" x="110" y="270" width="65" height="60"/><rect class="tile" x="175" y="270" width="65" height="60"/>
+            <rect id="mm-row" x="110" y="210" width="130" height="60" fill="#E7EDFE" opacity="0"/>
+            <g>
+              <text class="num" x="142" y="240">1</text><text class="num" x="207" y="240">2</text>
+              <text class="num" x="142" y="300">3</text><text class="num" x="207" y="300">4</text>
+            </g>
+
+            <g>
+              <rect class="tile" x="290" y="210" width="60" height="60" fill="#F7F9FC"/><rect class="tile" x="350" y="210" width="60" height="60" fill="#F7F9FC"/>
+              <rect class="tile" x="290" y="270" width="60" height="60" fill="#F7F9FC"/><rect class="tile" x="350" y="270" width="60" height="60" fill="#F7F9FC"/>
+              <text class="num" id="mm-c0" x="320" y="240" fill="#0B9484" font-weight="700" opacity="0">19</text>
+              <text class="num" id="mm-c1" x="380" y="240" fill="#0B9484" font-weight="700" opacity="0">22</text>
+              <text class="num" id="mm-c2" x="320" y="300" fill="#0B9484" font-weight="700" opacity="0">43</text>
+              <text class="num" id="mm-c3" x="380" y="300" fill="#0B9484" font-weight="700" opacity="0">50</text>
+              <text class="cap" x="424" y="304" text-anchor="start" fill="#0B9484" font-weight="700">AB</text>
+            </g>
+
+            <rect id="mm-cell" x="290" y="210" width="60" height="60" fill="none" stroke="#E09106" stroke-width="3.5" opacity="0"/>
+
+            <g stroke="#54628A" stroke-width="1" stroke-dasharray="4 4" opacity=".45">
+              <line x1="244" y1="240" x2="286" y2="240"/><line x1="244" y1="300" x2="286" y2="300"/>
+              <line x1="320" y1="154" x2="320" y2="206"/><line x1="380" y1="154" x2="380" y2="206"/>
+            </g>
+            <text class="cap" x="250" y="376">A row slides right, a B column slides down, and they meet in the answer.</text>
+          </svg>
+          <div class="controls">
+            <button type="button" id="mm-next">Next step</button>
+            <button type="button" class="ghost" id="mm-reset">Start over</button>
+          </div>
+          <figcaption id="mm-cap" aria-live="polite">Press <strong>Next step</strong> to fill the answer one cell at a time.</figcaption>
+        </figure>
+      </div>
+
+      <div class="work">
+        <b>Worked example</b>
+        <code>A = [1 2]      B = [5 6]
+    [3 4]          [7 8]
+
+row 1 &times; col 1 &rarr; 1&times;5 + 2&times;7 = <span class="ans">19</span>
+row 1 &times; col 2 &rarr; 1&times;6 + 2&times;8 = <span class="ans">22</span>
+row 2 &times; col 1 &rarr; 3&times;5 + 4&times;7 = <span class="ans">43</span>
+row 2 &times; col 2 &rarr; 3&times;6 + 4&times;8 = <span class="ans">50</span></code>
+      </div>
+
+      <div class="note note--warn">
+        <b>Common mix-up</b>
+        <strong>AB is not BA.</strong> Order changes the answer, and sometimes BA doesn't even exist. Think of it as "put on socks, then shoes" &mdash; swapping the order gives a very different result.
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ 04 TRANSPOSE ============================ -->
+<section class="section" id="transpose" style="padding-top:0">
+  <div class="wrap">
+    <article class="entry card rise">
+      <div class="entry__head"><span class="entry__num">04</span><h2>Transpose</h2></div>
+      <p class="entry__one">Tip the table over onto its side. Rows become columns, columns become rows.</p>
+
+      <div class="formula">(A<sup>T</sup>)<sub>ij</sub> = A<sub>ji</sub>&nbsp;&nbsp;&nbsp;<span style="opacity:.55">&larr; "whatever was at row j column i is now at row i column j"</span></div>
+
+      <div class="split">
+        <div class="prose">
+          <h3>In plain words</h3>
+          <p>Imagine the grid printed on a sheet of glass. Hold the top-left corner still and flip the sheet over along the diagonal. The numbers don't change value &mdash; they just move seats. Row 1 stands up and becomes column 1.</p>
+          <p>The formula says exactly that, in the shortest possible way: swap the two subscripts. Row-and-column becomes column-and-row.</p>
+          <p>A 2&times;3 grid transposes into a 3&times;2 grid. The shape turns on its side too.</p>
+
+          <div class="note note--real">
+            <b>Everyday example</b>
+            A spreadsheet with months down the side and products across the top. Your boss wants it the other way round. You click "transpose" and the same numbers reappear rotated. That button <em>is</em> A<sup>T</sup>.
+          </div>
+
+          <h3>Why it exists at all</h3>
+          <p>Mostly to make shapes fit. Remember a<sup>T</sup>b from item 02? The T was there to turn a standing column into a lying-down row so the two lists could face each other. Transposing is the standard way of getting two matrices to line up before multiplying them.</p>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 520 280" role="img" aria-labelledby="tT tD">
+            <title id="tT">A two by three matrix flipped into a three by two matrix</title>
+            <desc id="tD">The first row, one two three, becomes the first column. The second row, four five six, becomes the second column.</desc>
+            <text class="cap" x="40" y="48" text-anchor="start" font-weight="700">A &mdash; 2 rows, 3 columns</text>
+            <g transform="translate(40,60)">
+              <rect class="tile" x="0" y="0" width="56" height="56" fill="#E7EDFE" stroke="#2F5BEA"/>
+              <rect class="tile" x="56" y="0" width="56" height="56" fill="#E7EDFE" stroke="#2F5BEA"/>
+              <rect class="tile" x="112" y="0" width="56" height="56" fill="#E7EDFE" stroke="#2F5BEA"/>
+              <rect class="tile" x="0" y="56" width="56" height="56" fill="#FCE7F0" stroke="#DD3178"/>
+              <rect class="tile" x="56" y="56" width="56" height="56" fill="#FCE7F0" stroke="#DD3178"/>
+              <rect class="tile" x="112" y="56" width="56" height="56" fill="#FCE7F0" stroke="#DD3178"/>
+              <text class="num" x="28" y="28">1</text><text class="num" x="84" y="28">2</text><text class="num" x="140" y="28">3</text>
+              <text class="num" x="28" y="84">4</text><text class="num" x="84" y="84">5</text><text class="num" x="140" y="84">6</text>
+              <line x1="-6" y1="-6" x2="118" y2="118" stroke="#54628A" stroke-width="1.5" stroke-dasharray="6 5"/>
+              <text class="cap" x="84" y="146">flip along the dashed line</text>
+            </g>
+
+            <path d="M240 118 q40 -34 80 0" fill="none" stroke="#54628A" stroke-width="2" marker-end="url(#ahSoft)"/>
+            <text class="cap" x="280" y="76">flip</text>
+
+            <text class="cap" x="352" y="30" text-anchor="start" font-weight="700">A&#7488; &mdash; 3 rows, 2 columns</text>
+            <g transform="translate(352,42)">
+              <rect class="tile" x="0" y="0" width="56" height="56" fill="#E7EDFE" stroke="#2F5BEA"/>
+              <rect class="tile" x="56" y="0" width="56" height="56" fill="#FCE7F0" stroke="#DD3178"/>
+              <rect class="tile" x="0" y="56" width="56" height="56" fill="#E7EDFE" stroke="#2F5BEA"/>
+              <rect class="tile" x="56" y="56" width="56" height="56" fill="#FCE7F0" stroke="#DD3178"/>
+              <rect class="tile" x="0" y="112" width="56" height="56" fill="#E7EDFE" stroke="#2F5BEA"/>
+              <rect class="tile" x="56" y="112" width="56" height="56" fill="#FCE7F0" stroke="#DD3178"/>
+              <text class="num" x="28" y="28">1</text><text class="num" x="84" y="28">4</text>
+              <text class="num" x="28" y="84">2</text><text class="num" x="84" y="84">5</text>
+              <text class="num" x="28" y="140">3</text><text class="num" x="84" y="140">6</text>
+              <text class="cap" x="56" y="196">the blue row is now a blue column</text>
+            </g>
+          </svg>
+          <figcaption>Same six numbers, same order along each strip &mdash; only the direction they run has changed.</figcaption>
+        </figure>
+      </div>
+
+      <div class="work">
+        <b>Worked example</b>
+        <code>A   = [1 2 3]        A&#7488; = [1 4]
+      [4 5 6]              [2 5]
+                           [3 6]
+
+Check one cell:  A&#7488; at row 3, column 1
+                 = A at row 1, column 3
+                 = <span class="ans">3</span>  &#10003;</code>
+      </div>
+
+      <div class="note note--warn">
+        <b>Common mix-up</b>
+        When you transpose a product, the order flips too: <strong>(AB)&#7488; = B&#7488;A&#7488;</strong>, not A&#7488;B&#7488;. Same as taking off shoes and socks &mdash; undoing happens in reverse order.
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ 05 INVERSE ============================ -->
+<section class="section" id="inverse" style="padding-top:0">
+  <div class="wrap">
+    <article class="entry card rise">
+      <div class="entry__head"><span class="entry__num">05</span><h2>Inverse</h2></div>
+      <p class="entry__one">The undo button. A&#8315;&#185; is the matrix that cancels out whatever A did.</p>
+
+      <div class="formula">A<sup>&minus;1</sup>A = AA<sup>&minus;1</sup> = <span class="hl">I</span>&nbsp;&nbsp;&nbsp;<span style="opacity:.55">&larr; I is the "do nothing" matrix</span></div>
+
+      <div class="split">
+        <div class="prose">
+          <h3>In plain words</h3>
+          <p>With ordinary numbers, the undo of &times;5 is &times;&#8531;, because 5 &times; &#8531; = 1, and multiplying by 1 leaves things alone. Matrices work the same way. A&#8315;&#185; is the "&#8531;" of the matrix world, and <strong>I</strong> is its "1".</p>
+          <p><strong>I</strong>, the identity matrix, has 1s down the diagonal and 0s everywhere else. Multiply anything by I and it comes back untouched. It is the mathematical equivalent of doing nothing.</p>
+          <p>The formula is saying: undo-then-do and do-then-undo both land you exactly where you started. Order doesn't matter here, which is unusual and rather nice.</p>
+
+          <div class="note note--real">
+            <b>Everyday example</b>
+            A is a coding machine that scrambles a message. A&#8315;&#185; is the decoder. Run your message through both and you get your original message back, letter for letter. If a decoder exists, the code is reversible.
+          </div>
+
+          <h3>The catch</h3>
+          <p>Not every matrix has an inverse. If A throws information away &mdash; squashing everything flat &mdash; nothing can bring it back. You can tell whether this has happened by checking the determinant (item 06). If det(A) = 0, there is <strong>no</strong> inverse. Ever.</p>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 540 250" role="img" aria-labelledby="iT iD">
+            <title id="iT">A machine and its undo machine returning the original vector</title>
+            <desc id="iD">A vector passes through matrix A, becomes a changed vector, passes through A inverse, and returns to its original value.</desc>
+            <rect class="tile" x="14" y="66" width="76" height="64" fill="#E7EDFE" stroke="#2F5BEA" stroke-width="2"/>
+            <text class="num" x="52" y="98" fill="#2F5BEA" font-weight="700">v</text>
+            <text class="cap" x="52" y="150">what you had</text>
+
+            <line x1="94" y1="98" x2="140" y2="98" stroke="#54628A" stroke-width="2" marker-end="url(#ahSoft)"/>
+
+            <rect x="144" y="56" width="90" height="84" rx="4" fill="#141D34"/>
+            <text class="num" x="189" y="98" fill="#fff" font-weight="700">A</text>
+            <text class="cap" x="189" y="164">do the thing</text>
+
+            <line x1="238" y1="98" x2="284" y2="98" stroke="#54628A" stroke-width="2" marker-end="url(#ahSoft)"/>
+
+            <rect class="tile" x="288" y="66" width="76" height="64" fill="#FCE7F0" stroke="#DD3178" stroke-width="2"/>
+            <text class="num" x="326" y="98" fill="#DD3178" font-weight="700">Av</text>
+            <text class="cap" x="326" y="150">scrambled</text>
+
+            <line x1="368" y1="98" x2="414" y2="98" stroke="#54628A" stroke-width="2" marker-end="url(#ahSoft)"/>
+
+            <rect x="418" y="56" width="106" height="84" rx="4" fill="#0B9484"/>
+            <text class="num" x="471" y="98" fill="#fff" font-weight="700">A&#8315;&#185;</text>
+            <text class="cap" x="471" y="164">undo the thing</text>
+
+            <path d="M524 140 v56 H52 v-56" fill="none" stroke="#0B9484" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#ahTeal)"/>
+            <text class="cap" x="288" y="216" fill="#0B9484" font-weight="700">&hellip;and you are exactly back where you started&nbsp;&nbsp;(that's what &ldquo;= I&rdquo; means)</text>
+          </svg>
+          <figcaption>A does something to v. A&#8315;&#185; puts it back. The round trip is the identity, I.</figcaption>
+        </figure>
+      </div>
+
+      <div class="work">
+        <b>Worked example &mdash; the 2&times;2 shortcut</b>
+        <code>A = [4 7]      det(A) = 4&times;6 &minus; 7&times;2 = 24 &minus; 14 = 10
+    [2 6]
+
+Swap the diagonal, flip the sign of the other two,
+then divide everything by the determinant:
+
+A&#8315;&#185; = (1/10) [ 6  &minus;7]  =  [ 0.6  &minus;0.7]
+              [&minus;2   4]     [&minus;0.2   0.4]
+
+Check:  A&#8315;&#185;A = <span class="ans">[1 0]</span>
+                <span class="ans">[0 1]</span>   &larr; that's I</code>
+      </div>
+
+      <div class="note note--warn">
+        <b>Common mix-up</b>
+        A&#8315;&#185; does <em>not</em> mean "1 divided by each number in A". There is no such thing as dividing by a matrix &mdash; multiplying by the inverse is the closest thing that exists.
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ 06 DETERMINANT ============================ -->
+<section class="section" id="det" style="padding-top:0">
+  <div class="wrap">
+    <article class="entry card rise">
+      <div class="entry__head"><span class="entry__num">06</span><h2>Determinant (2&times;2)</h2></div>
+      <p class="entry__one">One number that tells you how much a matrix stretches or shrinks area.</p>
+
+      <div class="formula">det(A) = <span class="hl">a</span><sub>11</sub><span class="hl">a</span><sub>22</sub> &minus; <span class="hl2">a</span><sub>12</sub><span class="hl2">a</span><sub>21</sub>&nbsp;&nbsp;&nbsp;<span style="opacity:.55">&larr; down-diagonal minus up-diagonal</span></div>
+
+      <div class="split">
+        <div class="prose">
+          <h3>In plain words</h3>
+          <p>Multiply the two numbers on the main diagonal (top-left &times; bottom-right). Multiply the other two. Subtract the second from the first. Done &mdash; that's the whole calculation for a 2&times;2.</p>
+
+          <h3>But what is it <em>for</em>?</h3>
+          <p>Think of a photocopier's zoom setting. If det(A) = 3, every shape that A touches comes out with <strong>three times the area</strong>. If det(A) = 0.5, areas are halved.</p>
+          <p>Two special readings:</p>
+          <p><strong>det = 0</strong> means the matrix flattens everything into a line. Area gone, information gone, and no undo is possible &mdash; which is exactly why a zero determinant means no inverse exists.</p>
+          <p><strong>Negative det</strong> means the shape got flipped over, like a mirror image. The size of the number is still the area factor; the minus sign is just telling you it was turned inside out.</p>
+
+          <div class="note note--real">
+            <b>Everyday example</b>
+            You roll out pizza dough. If your rolling squashes a 1&nbsp;cm&sup2; blob into 5&nbsp;cm&sup2;, the determinant of your rolling is 5. If you flatten it into a straight line, the determinant is 0 and you can't reconstruct the blob.
+          </div>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 540 320" role="img" aria-labelledby="detT detD">
+            <title id="detT">The determinant as the area of a parallelogram</title>
+            <desc id="detD">Two arrows on graph paper form a parallelogram whose area equals three times two minus one times one, which is five.</desc>
+            <rect x="60" y="90" width="200" height="160" fill="url(#gp40)"/>
+            <polygon points="60,250 180,210 220,130 100,170" fill="#0B9484" fill-opacity=".16" stroke="#0B9484" stroke-width="1.5" stroke-dasharray="5 4"/>
+            <line x1="60" y1="250" x2="260" y2="250" stroke="#141D34" stroke-width="1.5" marker-end="url(#ahInk)"/>
+            <line x1="60" y1="250" x2="60" y2="80" stroke="#141D34" stroke-width="1.5" marker-end="url(#ahInk)"/>
+            <line x1="60" y1="250" x2="180" y2="210" stroke="#2F5BEA" stroke-width="4" marker-end="url(#ahBlue)"/>
+            <line x1="60" y1="250" x2="100" y2="170" stroke="#DD3178" stroke-width="4" marker-end="url(#ahPink)"/>
+            <text class="cap" x="146" y="248" fill="#2F5BEA" font-weight="700">column 1</text>
+            <text class="cap" x="56" y="150" text-anchor="end" fill="#DD3178" font-weight="700">column 2</text>
+            <text class="cap" x="160" y="196" fill="#0B9484" font-weight="700">area = 5</text>
+            <text class="cap" x="160" y="292">the two columns of A, drawn as arrows</text>
+
+            <g transform="translate(340,110)">
+              <rect class="tile" x="0" y="0" width="60" height="60"/><rect class="tile" x="60" y="0" width="60" height="60"/>
+              <rect class="tile" x="0" y="60" width="60" height="60"/><rect class="tile" x="60" y="60" width="60" height="60"/>
+              <text class="num" x="30" y="30">3</text><text class="num" x="90" y="30">1</text>
+              <text class="num" x="30" y="90">1</text><text class="num" x="90" y="90">2</text>
+              <line x1="18" y1="18" x2="102" y2="102" stroke="#0B9484" stroke-width="3"/>
+              <line x1="102" y1="18" x2="18" y2="102" stroke="#DD3178" stroke-width="3"/>
+              <text class="cap" x="60" y="-22" font-weight="700">A</text>
+              <text class="cap" x="60" y="146" fill="#0B9484">3 &times; 2 = 6</text>
+              <text class="cap" x="60" y="168" fill="#DD3178">1 &times; 1 = 1</text>
+              <text class="cap" x="60" y="196" font-weight="700">6 &minus; 1 = 5</text>
+            </g>
+          </svg>
+          <figcaption>The determinant is literally the area of the box the two columns make. Here it comes out as 5 squares.</figcaption>
+        </figure>
+      </div>
+
+      <div class="work">
+        <b>Worked example</b>
+        <code>A = [3 1]
+    [1 2]
+
+det(A) = (3 &times; 2) &minus; (1 &times; 1)
+       = 6 &minus; 1
+       = <span class="ans">5</span>     &rarr; areas grow 5&times;, and an inverse exists
+
+B = [2 4]
+    [1 2]
+
+det(B) = (2 &times; 2) &minus; (4 &times; 1) = 4 &minus; 4 = <span class="ans">0</span>
+       &rarr; everything squashed onto a line, no inverse</code>
+      </div>
+
+      <div class="note note--warn">
+        <b>Common mix-up</b>
+        The straight vertical bars around a matrix mean "determinant", not "absolute value" and not "size of the matrix". And the subtraction runs one way only: main diagonal <em>minus</em> the other one.
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ 07 TRACE ============================ -->
+<section class="section" id="trace" style="padding-top:0">
+  <div class="wrap">
+    <article class="entry card rise">
+      <div class="entry__head"><span class="entry__num">07</span><h2>Trace</h2></div>
+      <p class="entry__one">Add up the numbers on the main diagonal. Ignore everything else.</p>
+
+      <div class="formula">tr(A) = &Sigma; <span class="hl">A</span><sub>ii</sub> = A<sub>11</sub> + A<sub>22</sub> + &hellip; + A<sub>nn</sub></div>
+
+      <div class="split">
+        <div class="prose">
+          <h3>In plain words</h3>
+          <p>Start at the top-left corner. Walk diagonally down to the bottom-right, stepping one right and one down each time. Add up every number you step on. That total is the trace.</p>
+          <p>The <strong>A<sub>ii</sub></strong> notation means "same row number as column number" &mdash; row 1 column 1, row 2 column 2, and so on. Those are exactly the diagonal seats.</p>
+          <p>It is the easiest operation on this whole sheet. No multiplication, no flipping, no order to get wrong.</p>
+
+          <div class="note note--real">
+            <b>Everyday example</b>
+            A table of "how much each department buys from each department". The diagonal is what each department buys <em>from itself</em>. The trace is the total amount of internal, in-house spending &mdash; one number summarising the self-dealing.
+          </div>
+
+          <h3>Why anyone cares</h3>
+          <p>Two lovely facts tie this sheet together: the trace equals the <strong>sum</strong> of the eigenvalues, and the determinant equals their <strong>product</strong>. So you can often sanity-check eigenvalues in your head without solving anything.</p>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 500 280" role="img" aria-labelledby="trT trD">
+            <title id="trT">Trace of a three by three matrix</title>
+            <desc id="trD">The diagonal entries two, five and eight are highlighted and added to give fifteen.</desc>
+            <g transform="translate(50,50)">
+              <rect class="tile" x="0" y="0" width="60" height="60" fill="#FDF2DC" stroke="#E09106" stroke-width="2.5"/>
+              <rect class="tile" x="60" y="0" width="60" height="60"/><rect class="tile" x="120" y="0" width="60" height="60"/>
+              <rect class="tile" x="0" y="60" width="60" height="60"/>
+              <rect class="tile" x="60" y="60" width="60" height="60" fill="#FDF2DC" stroke="#E09106" stroke-width="2.5"/>
+              <rect class="tile" x="120" y="60" width="60" height="60"/>
+              <rect class="tile" x="0" y="120" width="60" height="60"/><rect class="tile" x="60" y="120" width="60" height="60"/>
+              <rect class="tile" x="120" y="120" width="60" height="60" fill="#FDF2DC" stroke="#E09106" stroke-width="2.5"/>
+              <text class="num" x="30" y="30" font-weight="700">2</text><text class="num" x="90" y="30" opacity=".35">9</text><text class="num" x="150" y="30" opacity=".35">4</text>
+              <text class="num" x="30" y="90" opacity=".35">7</text><text class="num" x="90" y="90" font-weight="700">5</text><text class="num" x="150" y="90" opacity=".35">3</text>
+              <text class="num" x="30" y="150" opacity=".35">6</text><text class="num" x="90" y="150" opacity=".35">1</text><text class="num" x="150" y="150" font-weight="700">8</text>
+              <text class="cap" x="90" y="-20" font-weight="700">A</text>
+              <text class="cap" x="90" y="206">the greyed-out numbers play no part</text>
+            </g>
+
+            <path d="M244 140 h48" fill="none" stroke="#54628A" stroke-width="2" marker-end="url(#ahSoft)"/>
+            <text class="cap" x="380" y="96">2 &nbsp;+&nbsp; 5 &nbsp;+&nbsp; 8</text>
+            <line x1="320" y1="112" x2="440" y2="112" stroke="#D3DBE9" stroke-width="1.5"/>
+            <rect class="tile" x="330" y="122" width="100" height="52" fill="#E0F4F1" stroke="#0B9484" stroke-width="2"/>
+            <text class="num" x="380" y="148" fill="#0B9484" font-weight="700">15</text>
+            <text class="cap" x="380" y="196">tr(A) = 15</text>
+          </svg>
+          <figcaption>Only the top-left-to-bottom-right diagonal counts. Everything off it is ignored completely.</figcaption>
+        </figure>
+      </div>
+
+      <div class="work">
+        <b>Worked example</b>
+        <code>A = [2 9 4]
+    [7 5 3]
+    [6 1 8]
+
+tr(A) = 2 + 5 + 8 = <span class="ans">15</span>
+
+(the 9, 4, 7, 3, 6 and 1 are simply not invited)</code>
+      </div>
+
+      <div class="note note--warn">
+        <b>Common mix-up</b>
+        Only the main diagonal counts &mdash; not the other one running bottom-left to top-right. And the trace only makes sense for square matrices; a 2&times;3 grid has no proper diagonal to walk down.
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ 08 EIGENVALUE ============================ -->
+<section class="section" id="eigen" style="padding-top:0">
+  <div class="wrap">
+    <article class="entry card rise">
+      <div class="entry__head"><span class="entry__num">08</span><h2>Eigenvalue equation</h2></div>
+      <p class="entry__one">Most arrows get turned by a matrix. A few stubborn ones don't &mdash; they only get longer or shorter. Those are the eigenvectors.</p>
+
+      <div class="formula">A<span class="hl">v</span> = &lambda;<span class="hl">v</span>&nbsp;&nbsp;&nbsp;<span style="opacity:.55">&larr; "doing A to v is the same as just scaling v by the number &lambda;"</span></div>
+
+      <div class="split">
+        <div class="prose">
+          <h3>In plain words</h3>
+          <p>The left side, <strong>Av</strong>, is the full messy operation: rotate, stretch, skew. The right side, <strong>&lambda;v</strong>, is the laziest possible operation: leave the direction alone and just multiply the length by a number.</p>
+          <p>The equation asks: <em>for which arrows are those two things identical?</em> Those arrows are the <strong>eigenvectors</strong> (the surviving directions) and each one's stretch factor &lambda; is its <strong>eigenvalue</strong>.</p>
+          <p>&lambda; = 2 means "twice as long, same way". &lambda; = 0.5 means "half as long". &lambda; = &minus;1 means "same length, pointing backwards".</p>
+
+          <div class="note note--real">
+            <b>Everyday example</b>
+            Stretch a rubber sheet sideways. A dot sitting on the horizontal centre line slides straight out along that same line &mdash; it never leaves it. A dot on a diagonal gets dragged sideways and ends up at a new angle. The horizontal line is an eigenvector of the stretch; everything else gets turned.
+          </div>
+
+          <h3>Why this is the big one</h3>
+          <p>Eigenvectors are the directions in which a complicated system behaves simply. That's why they show up in how a bridge vibrates, how Google ranked pages, how a photo gets compressed, and how data science finds the few directions that carry most of the information.</p>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 560 300" role="img" aria-labelledby="eT eD">
+            <title id="eT">An ordinary direction turns, an eigenvector does not</title>
+            <desc id="eD">In the left panel an arrow changes angle after the matrix is applied. In the right panel the arrow stays on the same line and simply gets three times longer.</desc>
+            <text class="cap" x="130" y="26" font-weight="700" fill="#DD3178">an ordinary direction &mdash; it turns</text>
+            <rect x="50" y="90" width="180" height="150" fill="url(#gp30)"/>
+            <line x1="50" y1="240" x2="250" y2="240" stroke="#141D34" stroke-width="1.3" marker-end="url(#ahInk)"/>
+            <line x1="50" y1="240" x2="50" y2="80" stroke="#141D34" stroke-width="1.3" marker-end="url(#ahInk)"/>
+            <line x1="50" y1="240" x2="110" y2="210" stroke="#54628A" stroke-width="3.5" marker-end="url(#ahSoft)"/>
+            <line x1="50" y1="240" x2="200" y2="120" stroke="#DD3178" stroke-width="4" marker-end="url(#ahPink)"/>
+            <path d="M104 222 a52 52 0 0 0 22 -30" fill="none" stroke="#DD3178" stroke-width="1.4" stroke-dasharray="3 3"/>
+            <text class="cap" x="92" y="232" text-anchor="start" fill="#54628A">u</text>
+            <text class="cap" x="182" y="142" fill="#DD3178">Au</text>
+            <text class="cap" x="140" y="272">new length <tspan font-weight="700">and</tspan> a new angle</text>
+
+            <line x1="280" y1="40" x2="280" y2="270" stroke="#D3DBE9" stroke-width="1.5"/>
+
+            <text class="cap" x="420" y="26" font-weight="700" fill="#0B9484">an eigenvector &mdash; it holds its line</text>
+            <rect x="340" y="90" width="180" height="150" fill="url(#gp30)"/>
+            <line x1="340" y1="240" x2="540" y2="240" stroke="#141D34" stroke-width="1.3" marker-end="url(#ahInk)"/>
+            <line x1="340" y1="240" x2="340" y2="80" stroke="#141D34" stroke-width="1.3" marker-end="url(#ahInk)"/>
+            <line x1="340" y1="240" x2="530" y2="50" stroke="#0B9484" stroke-width="1.2" stroke-dasharray="6 5" opacity=".8"/>
+            <line x1="340" y1="240" x2="430" y2="150" stroke="#0B9484" stroke-width="4" marker-end="url(#ahTeal)"/>
+            <line x1="340" y1="240" x2="370" y2="210" stroke="#2F5BEA" stroke-width="5" marker-end="url(#ahBlue)"/>
+            <text class="cap" x="360" y="232" text-anchor="start" fill="#2F5BEA">v</text>
+            <text class="cap" x="452" y="146" fill="#0B9484">Av = 3v</text>
+            <text class="cap" x="430" y="272">same line, just <tspan font-weight="700">3&times; longer</tspan> &nbsp;&rarr;&nbsp; &lambda; = 3</text>
+          </svg>
+          <figcaption>Both arrows were hit with the same matrix A. Only the right-hand one stayed on its original dashed line.</figcaption>
+        </figure>
+      </div>
+
+      <div class="work">
+        <b>Worked example</b>
+        <code>A = [2 1]
+    [1 2]
+
+Try v = [1, 1]:
+   Av = [2&times;1 + 1&times;1,  1&times;1 + 2&times;1] = [3, 3] = 3 &times; [1,1]
+   &rarr; same direction, 3&times; longer, so <span class="ans">&lambda; = 3</span>  &#10003; eigenvector
+
+Try u = [2, 1]:
+   Au = [2&times;2 + 1&times;1,  1&times;2 + 2&times;1] = [5, 4]
+   &rarr; [5,4] is not a multiple of [2,1], the angle changed
+   &rarr; <span class="ans">not</span> an eigenvector
+
+Sanity check with items 06 and 07:
+   the two eigenvalues here are 3 and 1
+   sum  3 + 1 = 4 = tr(A) = 2 + 2   &#10003;
+   product 3 &times; 1 = 3 = det(A) = 4 &minus; 1   &#10003;</code>
+      </div>
+
+      <div class="note note--warn">
+        <b>Common mix-up</b>
+        &lambda; is a single plain number, while v is a whole list &mdash; the equation deliberately has a matrix on one side and a mere number on the other. Also, v = [0, 0] is banned: it satisfies the equation trivially and tells you nothing.
+      </div>
+      <p style="margin:22px 0 0"><a href="#eigen-deep" style="color:var(--blue);font-weight:600">Keep going &mdash; how to actually find them, and where they earn their keep &rarr;</a></p>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ DEEP DIVE: EIGEN ============================ -->
+<section class="section" id="eigen-deep" style="padding-top:0">
+  <div class="wrap">
+
+    <article class="entry card rise">
+      <div class="entry__head"><span class="entry__num">DEEP DIVE</span><h2>Eigenvalues &amp; eigenvectors</h2></div>
+      <p class="entry__one">Item 08 showed you the equation. This is the part where it stops being a symbol and starts being useful.</p>
+
+      <div class="split">
+        <div class="prose">
+          <h3>Decoding the two words</h3>
+          <p><strong>Eigen</strong> is German for &ldquo;own&rdquo; or &ldquo;characteristic&rdquo;. So an eigenvector is a matrix's <em>own</em> direction &mdash; a direction that belongs to it, that it refuses to rotate. An eigenvalue is that direction's <em>own</em> number: how much it gets stretched.</p>
+          <p>They always come in pairs. Every eigenvector arrives with exactly one eigenvalue attached, like a name badge saying &ldquo;&times;3&rdquo;.</p>
+          <p>An n&times;n matrix has n eigenvalues (counted properly), so a 2&times;2 has two, a 3&times;3 has three.</p>
+          <h3>The one-sentence version</h3>
+          <p>A matrix usually does something complicated. Eigenvectors are the handful of directions where it does something <em>boringly simple</em> instead &mdash; and that is exactly why they are worth hunting for.</p>
+          <div class="note note--real">
+            <b>Everyday example</b>
+            Spin a globe. Every city on it moves&hellip; except the two poles, which just sit there. The axis through the poles is the eigenvector of that rotation, with eigenvalue 1 (&ldquo;unchanged&rdquo;). Every rotation of a ball has one, which is why a spinning object always has an axis.
+          </div>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 540 240" role="img" aria-labelledby="csT csD">
+            <title id="csT">The characteristic equation, drawn</title>
+            <desc id="csD">Matrix A minus lambda times the identity matrix leaves lambda subtracted only along the diagonal, and the determinant of that is set to zero.</desc>
+            <g transform="translate(20,70)">
+              <rect class="tile" x="0" y="0" width="52" height="52"/><rect class="tile" x="52" y="0" width="52" height="52"/>
+              <rect class="tile" x="0" y="52" width="52" height="52"/><rect class="tile" x="52" y="52" width="52" height="52"/>
+              <text class="num" x="26" y="26">4</text><text class="num" x="78" y="26">1</text>
+              <text class="num" x="26" y="78">2</text><text class="num" x="78" y="78">3</text>
+              <text class="cap" x="52" y="-16" font-weight="700">A</text>
+            </g>
+            <text class="num" x="146" y="122">&minus;</text>
+            <text class="num" x="176" y="122" fill="#E09106" font-weight="700">&lambda;</text>
+            <g transform="translate(196,70)">
+              <rect class="tile" x="0" y="0" width="52" height="52" fill="#FDF2DC" stroke="#E09106"/><rect class="tile" x="52" y="0" width="52" height="52"/>
+              <rect class="tile" x="0" y="52" width="52" height="52"/><rect class="tile" x="52" y="52" width="52" height="52" fill="#FDF2DC" stroke="#E09106"/>
+              <text class="num" x="26" y="26">1</text><text class="num" x="78" y="26">0</text>
+              <text class="num" x="26" y="78">0</text><text class="num" x="78" y="78">1</text>
+              <text class="cap" x="52" y="-16" font-weight="700">I</text>
+            </g>
+            <text class="num" x="322" y="122">=</text>
+            <g transform="translate(352,70)">
+              <rect class="tile" x="0" y="0" width="66" height="52" fill="#FDF2DC" stroke="#E09106"/><rect class="tile" x="66" y="0" width="66" height="52"/>
+              <rect class="tile" x="0" y="52" width="66" height="52"/><rect class="tile" x="66" y="52" width="66" height="52" fill="#FDF2DC" stroke="#E09106"/>
+              <text class="num" x="33" y="26" font-size="16">4&minus;&lambda;</text><text class="num" x="99" y="26">1</text>
+              <text class="num" x="33" y="78">2</text><text class="num" x="99" y="78" font-size="16">3&minus;&lambda;</text>
+              <text class="cap" x="66" y="-16" font-weight="700">A &minus; &lambda;I</text>
+            </g>
+            <text class="cap" x="270" y="212" font-weight="700">now find the &lambda; that makes this flatten: det(A &minus; &lambda;I) = 0</text>
+          </svg>
+          <figcaption>&lambda;I only ever touches the diagonal, so &ldquo;subtract &lambda;I&rdquo; means &ldquo;take &lambda; off the diagonal and leave everything else alone&rdquo;.</figcaption>
+        </figure>
+      </div>
+
+      <div class="work">
+        <b>Worked example &mdash; finding both pairs by hand</b>
+        <code>A = [4 1]
+    [2 3]
+
+STEP 1 &mdash; write down det(A &minus; &lambda;I) = 0
+        (4&minus;&lambda;)(3&minus;&lambda;) &minus; (1)(2) = 0
+        &lambda;&sup2; &minus; 7&lambda; + 10 = 0
+
+        shortcut: the &lambda; term is always &minus;tr(A) = &minus;7
+                  the last term is always det(A) = 10
+
+STEP 2 &mdash; solve it
+        (&lambda; &minus; 5)(&lambda; &minus; 2) = 0   &rarr;   <span class="ans">&lambda; = 5</span>  and  <span class="ans">&lambda; = 2</span>
+
+STEP 3 &mdash; for each &lambda;, find the direction that survives
+
+  &lambda; = 5:  (4&minus;5)x + 1y = 0  &rarr;  &minus;x + y = 0  &rarr;  y = x
+           eigenvector <span class="ans">v = [1, 1]</span>
+           check: A[1,1] = [4+1, 2+3] = [5,5] = 5&times;[1,1]  &#10003;
+
+  &lambda; = 2:  (4&minus;2)x + 1y = 0  &rarr;  2x + y = 0  &rarr;  y = &minus;2x
+           eigenvector <span class="ans">v = [1, &minus;2]</span>
+           check: A[1,&minus;2] = [4&minus;2, 2&minus;6] = [2,&minus;4] = 2&times;[1,&minus;2]  &#10003;
+
+STEP 4 &mdash; sanity check against items 06 and 07
+        5 + 2 = 7  = tr(A)    &#10003;
+        5 &times; 2 = 10 = det(A)   &#10003;</code>
+      </div>
+
+      <div class="note note--warn">
+        <b>Common mix-up</b>
+        An eigenvector has no fixed length. [1,&nbsp;1] and [7,&nbsp;7] and [&minus;3,&nbsp;&minus;3] are all the same eigenvector, because a <em>direction</em> is what matters. Textbooks usually shrink it to length 1 so everyone writes the same thing down.
+      </div>
+    </article>
+
+    <!-- ---------- the zoo ---------- -->
+    <article class="entry card rise">
+      <h3 style="font-family:Fraunces,Georgia,serif;font-size:clamp(22px,3vw,28px);font-weight:700;margin:0">What the number &lambda; is telling you</h3>
+      <p class="lede" style="margin-top:12px">The eigenvector says <em>which way</em>. The eigenvalue says <em>what happens to it</em>. Five cases cover everything.</p>
+
+      <svg class="dia" style="margin-top:22px" viewBox="0 0 880 236" role="img" aria-labelledby="zT zD">
+        <title id="zT">Five kinds of eigenvalue</title>
+        <desc id="zD">Panels showing an arrow being lengthened, shortened, reversed, collapsed to a point, and rotated off its line.</desc>
+
+        <g>
+          <text class="cap" x="88" y="24" font-weight="700" fill="#0B9484">&lambda; &gt; 1</text>
+          <line x1="8" y1="110" x2="168" y2="110" stroke="#D3DBE9" stroke-width="1"/>
+          <line x1="88" y1="30" x2="88" y2="190" stroke="#D3DBE9" stroke-width="1"/>
+          <line x1="48" y1="150" x2="168" y2="30" stroke="#0B9484" stroke-width="1" stroke-dasharray="5 4" opacity=".7"/>
+          <line x1="88" y1="110" x2="168" y2="30" stroke="#0B9484" stroke-width="4" marker-end="url(#ahTeal)"/>
+          <line x1="88" y1="110" x2="128" y2="70" stroke="#2F5BEA" stroke-width="5" marker-end="url(#ahBlue)"/>
+          <text class="cap" x="88" y="206">stretched</text>
+          <text class="cap" x="88" y="226">&lambda; = 2 means twice as long</text>
+        </g>
+
+        <g transform="translate(176,0)">
+          <text class="cap" x="88" y="24" font-weight="700" fill="#0B9484">0 &lt; &lambda; &lt; 1</text>
+          <line x1="8" y1="110" x2="168" y2="110" stroke="#D3DBE9" stroke-width="1"/>
+          <line x1="88" y1="30" x2="88" y2="190" stroke="#D3DBE9" stroke-width="1"/>
+          <line x1="48" y1="150" x2="168" y2="30" stroke="#0B9484" stroke-width="1" stroke-dasharray="5 4" opacity=".7"/>
+          <line x1="88" y1="110" x2="128" y2="70" stroke="#2F5BEA" stroke-width="5" marker-end="url(#ahBlue)"/>
+          <line x1="88" y1="110" x2="108" y2="90" stroke="#0B9484" stroke-width="4" marker-end="url(#ahTeal)"/>
+          <text class="cap" x="88" y="206">shrunk</text>
+          <text class="cap" x="88" y="226">&lambda; = 0.5 means half as long</text>
+        </g>
+
+        <g transform="translate(352,0)">
+          <text class="cap" x="88" y="24" font-weight="700" fill="#DD3178">&lambda; &lt; 0</text>
+          <line x1="8" y1="110" x2="168" y2="110" stroke="#D3DBE9" stroke-width="1"/>
+          <line x1="88" y1="30" x2="88" y2="190" stroke="#D3DBE9" stroke-width="1"/>
+          <line x1="28" y1="170" x2="168" y2="30" stroke="#DD3178" stroke-width="1" stroke-dasharray="5 4" opacity=".7"/>
+          <line x1="88" y1="110" x2="128" y2="70" stroke="#2F5BEA" stroke-width="5" marker-end="url(#ahBlue)"/>
+          <line x1="88" y1="110" x2="48" y2="150" stroke="#DD3178" stroke-width="4" marker-end="url(#ahPink)"/>
+          <text class="cap" x="88" y="206">flipped backwards</text>
+          <text class="cap" x="88" y="226">same line, opposite way</text>
+        </g>
+
+        <g transform="translate(528,0)">
+          <text class="cap" x="88" y="24" font-weight="700" fill="#54628A">&lambda; = 0</text>
+          <line x1="8" y1="110" x2="168" y2="110" stroke="#D3DBE9" stroke-width="1"/>
+          <line x1="88" y1="30" x2="88" y2="190" stroke="#D3DBE9" stroke-width="1"/>
+          <line x1="88" y1="110" x2="128" y2="70" stroke="#2F5BEA" stroke-width="5" marker-end="url(#ahBlue)"/>
+          <circle cx="88" cy="110" r="7" fill="#54628A"/>
+          <text class="cap" x="88" y="206">collapsed to nothing</text>
+          <text class="cap" x="88" y="226">det = 0, no inverse exists</text>
+        </g>
+
+        <g transform="translate(704,0)">
+          <text class="cap" x="88" y="24" font-weight="700" fill="#E09106">no real &lambda;</text>
+          <line x1="8" y1="110" x2="168" y2="110" stroke="#D3DBE9" stroke-width="1"/>
+          <line x1="88" y1="30" x2="88" y2="190" stroke="#D3DBE9" stroke-width="1"/>
+          <path d="M128 70 a56 56 0 0 1 0 80" fill="none" stroke="#E09106" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <line x1="88" y1="110" x2="128" y2="70" stroke="#2F5BEA" stroke-width="5" marker-end="url(#ahBlue)"/>
+          <line x1="88" y1="110" x2="128" y2="150" stroke="#E09106" stroke-width="4" marker-end="url(#ahAmber)"/>
+          <text class="cap" x="88" y="206">everything turns</text>
+          <text class="cap" x="88" y="226">a pure rotation spares nobody</text>
+        </g>
+      </svg>
+
+      <div class="note">
+        <b>The rule of thumb engineers actually use</b>
+        Apply a matrix over and over and the direction with the <strong>biggest &#124;&lambda;&#124;</strong> takes over completely. &#124;&lambda;&#124; &gt; 1 anywhere means the system grows without limit. All &#124;&lambda;&#124; &lt; 1 means it settles down and dies out. That single check is how you tell a stable design from one that shakes itself apart.
+      </div>
+    </article>
+
+    <!-- ---------- real world 1: markov ---------- -->
+    <article class="entry card rise">
+      <h3 style="font-family:Fraunces,Georgia,serif;font-size:clamp(22px,3vw,28px);font-weight:700;margin:0">Real world 1 &mdash; where a market settles</h3>
+      <p class="lede" style="margin-top:12px">Two coffee brands. Each year, 20% of Brand A's customers defect to B, and 30% of B's come back to A. Who wins in the long run? The answer is an eigenvector.</p>
+
+      <div class="split">
+        <div class="prose">
+          <p>Write the switching as a matrix. Feed it this year's market share and it gives you next year's. Do that forever and the shares stop moving &mdash; they land on the direction the matrix leaves alone.</p>
+          <p>That resting point is the eigenvector with <strong>&lambda; = 1</strong>: apply another year of churn and nothing changes. Here it comes out at <strong>60% / 40%</strong>, and remarkably it does not depend at all on where you started.</p>
+          <p>The <em>second</em> eigenvalue is 0.5, and it tells you the speed: whatever advantage your starting position gave you is cut in half every year. After five years it's essentially gone.</p>
+          <div class="note note--real">
+            <b>Same maths, bigger job</b>
+            Swap coffee brands for web pages and switching rates for links, and this is <strong>Google PageRank</strong>. A page's rank is one entry of the &lambda;&nbsp;=&nbsp;1 eigenvector of the entire web's link matrix. It is the same calculation on billions of rows.
+          </div>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 520 290" role="img" aria-labelledby="mkT mkD">
+            <title id="mkT">Two brands swapping customers and the resulting steady share</title>
+            <desc id="mkD">Brand A and Brand B exchange customers at twenty and thirty percent, settling at a sixty forty split.</desc>
+            <circle cx="110" cy="90" r="46" fill="#E7EDFE" stroke="#2F5BEA" stroke-width="2.5"/>
+            <text class="num" x="110" y="90" fill="#2F5BEA" font-weight="700">A</text>
+            <circle cx="330" cy="90" r="46" fill="#FCE7F0" stroke="#DD3178" stroke-width="2.5"/>
+            <text class="num" x="330" y="90" fill="#DD3178" font-weight="700">B</text>
+            <path d="M148 64 q110 -46 220 0" fill="none" stroke="#2F5BEA" stroke-width="2.5" marker-end="url(#ahBlue)"/>
+            <text class="cap" x="240" y="34" fill="#2F5BEA" font-weight="700">20% leave A</text>
+            <path d="M292 122 q-110 46 -220 0" fill="none" stroke="#DD3178" stroke-width="2.5" marker-end="url(#ahPink)"/>
+            <text class="cap" x="184" y="164" fill="#DD3178" font-weight="700">30% leave B</text>
+            <path d="M64 90 a34 34 0 1 1 22 34" fill="none" stroke="#54628A" stroke-width="1.6" marker-end="url(#ahSoft)"/>
+            <text class="cap" x="46" y="34" fill="#54628A">80% stay</text>
+            <path d="M376 90 a34 34 0 1 0 -22 34" fill="none" stroke="#54628A" stroke-width="1.6" marker-end="url(#ahSoft)"/>
+            <text class="cap" x="398" y="34" fill="#54628A">70% stay</text>
+
+            <line x1="60" y1="196" x2="460" y2="196" stroke="#D3DBE9" stroke-width="1.5"/>
+            <text class="cap" x="60" y="188" text-anchor="start" font-weight="700">where it settles &mdash; whatever you start with</text>
+            <rect x="60" y="210" width="240" height="34" fill="#2F5BEA" rx="3"/>
+            <rect x="300" y="210" width="160" height="34" fill="#DD3178" rx="3"/>
+            <text class="cap" x="180" y="232" fill="#fff" font-weight="700">A &mdash; 60%</text>
+            <text class="cap" x="380" y="232" fill="#fff" font-weight="700">B &mdash; 40%</text>
+            <text class="cap" x="260" y="270">this split is the eigenvector for &lambda; = 1</text>
+          </svg>
+          <figcaption>Every arrow is a churn rate. The bar is the eigenvector the churn can no longer change.</figcaption>
+        </figure>
+      </div>
+
+      <div class="work">
+        <b>Worked example</b>
+        <code>P = [0.8  0.3]      column 1 = what happens to A's customers
+    [0.2  0.7]      column 2 = what happens to B's customers
+
+Start 100% with A:  [1.00, 0.00]
+  year 1  &rarr; [0.80, 0.20]
+  year 2  &rarr; [0.70, 0.30]
+  year 3  &rarr; [0.65, 0.35]
+  year 6  &rarr; [0.606, 0.394]
+  &hellip;      &rarr; <span class="ans">[0.60, 0.40]</span>  and it stops moving
+
+Why it stops: P &times; [0.6, 0.4] = [0.48+0.12, 0.12+0.28] = <span class="ans">[0.6, 0.4]</span>
+             &rarr; that is A v = 1&middot;v, so &lambda; = 1
+
+The other eigenvalue: tr(P) = 1.5, det(P) = 0.5
+             &lambda;&sup2; &minus; 1.5&lambda; + 0.5 = 0  &rarr;  &lambda; = 1 and <span class="ans">&lambda; = 0.5</span>
+             &rarr; the head start halves every single year</code>
+      </div>
+    </article>
+
+    <!-- ---------- real world 2: PCA ---------- -->
+    <article class="entry card rise">
+      <h3 style="font-family:Fraunces,Georgia,serif;font-size:clamp(22px,3vw,28px);font-weight:700;margin:0">Real world 2 &mdash; finding the story in a cloud of data</h3>
+      <p class="lede" style="margin-top:12px">Give a computer a thousand measurements per person and it drowns. Eigenvectors point at the two or three directions that actually carry the story.</p>
+
+      <div class="split">
+        <div class="prose">
+          <p>Plot height against weight for a crowd and you don't get a blob &mdash; you get a sausage, leaning. The long direction of that sausage is the first eigenvector, and it means something real: <em>overall body size</em>. The short direction across it is the second: <em>build, relative to size</em>.</p>
+          <p>Each eigenvalue measures how spread out the data is along its direction. A big eigenvalue means &ldquo;lots of the story lives here&rdquo;. A tiny one means &ldquo;this direction is basically noise, throw it away&rdquo;.</p>
+          <p>That trade &mdash; keep the big eigenvalues, bin the small ones &mdash; is called <strong>principal component analysis</strong>, and it's how a thousand columns get squashed into three without losing much.</p>
+          <div class="note note--real">
+            <b>Where you've met it</b>
+            Face recognition once ran on &ldquo;eigenfaces&rdquo;: the handful of eigenvectors that capture how faces differ. Image and audio compression, gene-expression studies, and the recommendation engines that group films by taste all lean on the same trick.
+          </div>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 460 300" role="img" aria-labelledby="pcT pcD">
+            <title id="pcT">A leaning cloud of data with its two principal directions</title>
+            <desc id="pcD">Scattered dots form an elongated cloud; a long teal arrow runs along the cloud and a short pink arrow crosses it.</desc>
+            <line x1="40" y1="262" x2="440" y2="262" stroke="#141D34" stroke-width="1.3" marker-end="url(#ahInk)"/>
+            <line x1="40" y1="262" x2="40" y2="30" stroke="#141D34" stroke-width="1.3" marker-end="url(#ahInk)"/>
+            <text class="cap" x="240" y="286">height</text>
+            <text class="cap" x="18" y="150" transform="rotate(-90 18 150)">weight</text>
+            <circle cx="166.1" cy="206.0" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="280.4" cy="128.8" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="157.0" cy="202.8" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="264.3" cy="166.5" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="153.9" cy="182.2" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="272.1" cy="151.1" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="321.1" cy="134.1" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="222.4" cy="164.1" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="368.1" cy="86.0" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="178.6" cy="171.8" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="236.3" cy="164.3" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="210.7" cy="174.2" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="250.1" cy="166.8" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="291.4" cy="136.0" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="137.6" cy="227.0" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="151.3" cy="204.0" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="149.6" cy="208.0" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="189.1" cy="190.7" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="409.7" cy="68.1" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="266.0" cy="121.8" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="219.3" cy="182.7" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="227.7" cy="172.9" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="228.1" cy="147.8" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="254.7" cy="137.1" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="328.3" cy="103.3" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="267.5" cy="145.0" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="277.4" cy="128.8" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="283.6" cy="134.1" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="303.6" cy="137.0" r="4.5" fill="#54628A" fill-opacity=".55"/>
+              <circle cx="231.8" cy="149.9" r="4.5" fill="#54628A" fill-opacity=".55"/>
+            <path d="M230.0 165.0 L137.6 214.3" fill="none" stroke="#0B9484" stroke-width="1.2" stroke-dasharray="5 4" opacity=".8"/>
+            <path d="M230.0 165.0 L322.4 115.7" fill="none" stroke="#0B9484" stroke-width="4.5" marker-end="url(#ahTeal)"/>
+            <path d="M230.0 165.0 L249.7 202.0" fill="none" stroke="#DD3178" stroke-width="4.5" marker-end="url(#ahPink)"/>
+            <text class="cap" x="368" y="66" fill="#0B9484" font-weight="700">1st &mdash; big &lambda;</text>
+            <text class="cap" x="368" y="86" fill="#0B9484">&ldquo;how big overall&rdquo;</text>
+            <text class="cap" x="300" y="228" fill="#DD3178" font-weight="700">2nd &mdash; small &lambda;</text>
+            <text class="cap" x="300" y="248" fill="#DD3178">&ldquo;build for that size&rdquo;</text>
+          </svg>
+          <figcaption>The cloud has an obvious grain. Eigenvectors find that grain automatically, in any number of dimensions.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <!-- ---------- real world 3: vibration ---------- -->
+    <article class="entry card rise">
+      <h3 style="font-family:Fraunces,Georgia,serif;font-size:clamp(22px,3vw,28px);font-weight:700;margin:0">Real world 3 &mdash; why bridges have a speed limit</h3>
+      <p class="lede" style="margin-top:12px">Anything that can wobble has a small set of shapes it prefers to wobble in. Those shapes are eigenvectors; their frequencies come from the eigenvalues.</p>
+
+      <div class="split">
+        <div class="prose">
+          <p>Pluck a guitar string and it doesn't flail randomly. It settles into a few clean patterns: one big belly, then two halves, then three. These <strong>mode shapes</strong> are the eigenvectors of the string, and each has its own natural frequency &mdash; the note you hear.</p>
+          <p>Buildings, aircraft wings, engine mounts and bridges all have them too. Engineers compute the eigenvalues before anything is built, because trouble starts when an outside rhythm matches one of them: wind gusts, marching feet, a rotor at a certain rpm. The wobble then feeds itself, and that is <strong>resonance</strong>.</p>
+          <div class="note note--real">
+            <b>Why soldiers break step on bridges</b>
+            A column marching in time can hit a bridge's natural frequency square on. Breaking step scatters the rhythm so it never lines up with any eigenvector. The same reasoning is why tall towers carry tuned mass dampers, and why washing machines shudder violently at one particular spin speed and are fine either side of it.
+          </div>
+        </div>
+
+        <figure>
+          <svg class="dia" viewBox="0 0 520 300" role="img" aria-labelledby="vbT vbD">
+            <title id="vbT">The first three vibration modes of a string</title>
+            <desc id="vbD">Three curves fixed at both ends: one hump, two humps, three humps, with rising frequency.</desc>
+            <g stroke="#D3DBE9" stroke-width="1.5" stroke-dasharray="4 4">
+              <line x1="90" y1="70" x2="430" y2="70"/><line x1="90" y1="160" x2="430" y2="160"/><line x1="90" y1="250" x2="430" y2="250"/>
+            </g>
+            <path d="M90.0 70.0 L95.7 68.4 L101.3 66.9 L107.0 65.3 L112.7 63.8 L118.3 62.2 L124.0 60.7 L129.7 59.2 L135.3 57.8 L141.0 56.4 L146.7 55.0 L152.3 53.7 L158.0 52.4 L163.7 51.1 L169.3 49.9 L175.0 48.8 L180.7 47.7 L186.3 46.7 L192.0 45.7 L197.7 44.8 L203.3 44.0 L209.0 43.3 L214.7 42.6 L220.3 42.0 L226.0 41.5 L231.7 41.0 L237.3 40.7 L243.0 40.4 L248.7 40.2 L254.3 40.0 L260.0 40.0 L265.7 40.0 L271.3 40.2 L277.0 40.4 L282.7 40.7 L288.3 41.0 L294.0 41.5 L299.7 42.0 L305.3 42.6 L311.0 43.3 L316.7 44.0 L322.3 44.8 L328.0 45.7 L333.7 46.7 L339.3 47.7 L345.0 48.8 L350.7 49.9 L356.3 51.1 L362.0 52.4 L367.7 53.7 L373.3 55.0 L379.0 56.4 L384.7 57.8 L390.3 59.2 L396.0 60.7 L401.7 62.2 L407.3 63.8 L413.0 65.3 L418.7 66.9 L424.3 68.4 L430.0 70.0" fill="none" stroke="#2F5BEA" stroke-width="4"/>
+            <path d="M90.0 160.0 L95.7 156.9 L101.3 153.8 L107.0 150.7 L112.7 147.8 L118.3 145.0 L124.0 142.4 L129.7 139.9 L135.3 137.7 L141.0 135.7 L146.7 134.0 L152.3 132.6 L158.0 131.5 L163.7 130.7 L169.3 130.2 L175.0 130.0 L180.7 130.2 L186.3 130.7 L192.0 131.5 L197.7 132.6 L203.3 134.0 L209.0 135.7 L214.7 137.7 L220.3 139.9 L226.0 142.4 L231.7 145.0 L237.3 147.8 L243.0 150.7 L248.7 153.8 L254.3 156.9 L260.0 160.0 L265.7 163.1 L271.3 166.2 L277.0 169.3 L282.7 172.2 L288.3 175.0 L294.0 177.6 L299.7 180.1 L305.3 182.3 L311.0 184.3 L316.7 186.0 L322.3 187.4 L328.0 188.5 L333.7 189.3 L339.3 189.8 L345.0 190.0 L350.7 189.8 L356.3 189.3 L362.0 188.5 L367.7 187.4 L373.3 186.0 L379.0 184.3 L384.7 182.3 L390.3 180.1 L396.0 177.6 L401.7 175.0 L407.3 172.2 L413.0 169.3 L418.7 166.2 L424.3 163.1 L430.0 160.0" fill="none" stroke="#0B9484" stroke-width="4"/>
+            <path d="M90.0 250.0 L95.7 245.3 L101.3 240.7 L107.0 236.4 L112.7 232.4 L118.3 228.8 L124.0 225.7 L129.7 223.3 L135.3 221.5 L141.0 220.4 L146.7 220.0 L152.3 220.4 L158.0 221.5 L163.7 223.3 L169.3 225.7 L175.0 228.8 L180.7 232.4 L186.3 236.4 L192.0 240.7 L197.7 245.3 L203.3 250.0 L209.0 254.7 L214.7 259.3 L220.3 263.6 L226.0 267.6 L231.7 271.2 L237.3 274.3 L243.0 276.7 L248.7 278.5 L254.3 279.6 L260.0 280.0 L265.7 279.6 L271.3 278.5 L277.0 276.7 L282.7 274.3 L288.3 271.2 L294.0 267.6 L299.7 263.6 L305.3 259.3 L311.0 254.7 L316.7 250.0 L322.3 245.3 L328.0 240.7 L333.7 236.4 L339.3 232.4 L345.0 228.8 L350.7 225.7 L356.3 223.3 L362.0 221.5 L367.7 220.4 L373.3 220.0 L379.0 220.4 L384.7 221.5 L390.3 223.3 L396.0 225.7 L401.7 228.8 L407.3 232.4 L413.0 236.4 L418.7 240.7 L424.3 245.3 L430.0 250.0" fill="none" stroke="#DD3178" stroke-width="4"/>
+            <g fill="#141D34">
+              <circle cx="90" cy="70" r="5"/><circle cx="430" cy="70" r="5"/>
+              <circle cx="90" cy="160" r="5"/><circle cx="430" cy="160" r="5"/>
+              <circle cx="90" cy="250" r="5"/><circle cx="430" cy="250" r="5"/>
+            </g>
+            <text class="cap" x="80" y="74" text-anchor="end" fill="#2F5BEA" font-weight="700">mode 1</text>
+            <text class="cap" x="80" y="164" text-anchor="end" fill="#0B9484" font-weight="700">mode 2</text>
+            <text class="cap" x="80" y="254" text-anchor="end" fill="#DD3178" font-weight="700">mode 3</text>
+            <text class="cap" x="446" y="74" text-anchor="start">lowest note</text>
+            <text class="cap" x="446" y="164" text-anchor="start">2&times; faster</text>
+            <text class="cap" x="446" y="254" text-anchor="start">3&times; faster</text>
+            <text class="cap" x="260" y="290">each shape is an eigenvector &mdash; its frequency comes from the eigenvalue</text>
+          </svg>
+          <figcaption>Fixed at both ends, only certain shapes are allowed. Everything else is a mixture of these.</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <!-- ---------- more scenarios ---------- -->
+    <article class="entry card rise">
+      <h3 style="font-family:Fraunces,Georgia,serif;font-size:clamp(22px,3vw,28px);font-weight:700;margin:0">Seven more places this shows up</h3>
+      <p class="lede" style="margin-top:12px">Once you know the shape of the idea, you start seeing it everywhere.</p>
+      <div class="scroller" style="margin-top:20px">
+        <table>
+          <thead>
+            <tr><th scope="col">Field</th><th scope="col">What the eigenvector is</th><th scope="col">What the eigenvalue tells you</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Epidemics</td><td>Who gets infected next, by group</td><td>The growth rate R &mdash; above 1 it spreads, below 1 it fades</td></tr>
+            <tr><td>Wildlife management</td><td>The stable mix of ages in a population</td><td>Long-run growth per year; below 1 the species declines</td></tr>
+            <tr><td>Control &amp; robotics</td><td>The ways an error can drift</td><td>Whether a wobble self-corrects or runs away</td></tr>
+            <tr><td>Quantum physics</td><td>The states a particle can be found in</td><td>The actual energy you'd measure</td></tr>
+            <tr><td>Image compression</td><td>The recurring visual patterns in a picture</td><td>How much of the picture that pattern accounts for</td></tr>
+            <tr><td>Finance</td><td>Groups of assets that move together</td><td>How much market risk sits in that group</td></tr>
+            <tr><td>Google Maps &amp; networks</td><td>The best-connected clusters in a network</td><td>How tightly that cluster holds together</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note note--real">
+        <b>The five-second summary</b>
+        Find the directions a system doesn't mess up, and the system stops being complicated. Eigenvectors are those directions; eigenvalues are the price of admission &mdash; grow, shrink, flip, or vanish.
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============================ 18 VALUES ============================ -->
+<section class="section" id="values" style="padding-top:0">
+  <div class="wrap">
+    <article class="entry card rise">
+      <div class="entry__head"><span class="entry__num">GALLERY</span><h2>Eighteen values</h2></div>
+      <p class="entry__one">A <strong>value</strong> is a single number &mdash; one lonely figure with no direction attached. Here are eighteen you will actually meet, and what each one is really telling you.</p>
+
+      <div class="split">
+        <div class="prose">
+          <h3>Three ways to answer &ldquo;how big?&rdquo;</h3>
+          <p>Even something as simple as the length of an arrow has more than one honest answer, and each one is used by different people for different reasons.</p>
+          <p>The <strong>straight-line length</strong> is what a bird would fly. The <strong>Manhattan length</strong> is what a taxi drives, because it can't cut through buildings. The <strong>biggest component</strong> ignores everything except the worst offender, which is exactly what a safety engineer cares about.</p>
+          <p>Same arrow, three numbers: 5, 7 and 4. None of them is wrong.</p>
+        </div>
+        <figure>
+          <svg class="dia" viewBox="0 0 540 270" role="img" aria-labelledby="nmT nmD">
+            <title id="nmT">Three ways to measure the same arrow</title>
+            <desc id="nmD">A straight diagonal line of length five, a staircase path of length seven, and a single horizontal step of length four.</desc>
+            <rect x="60" y="100" width="160" height="120" fill="url(#gp40)"/>
+            <line x1="60" y1="220" x2="270" y2="220" stroke="#141D34" stroke-width="1.3" marker-end="url(#ahInk)"/>
+            <line x1="60" y1="220" x2="60" y2="86" stroke="#141D34" stroke-width="1.3" marker-end="url(#ahInk)"/>
+            <path d="M60 220 H220 V100" fill="none" stroke="#DD3178" stroke-width="6" stroke-linejoin="round" opacity=".9"/>
+            <line x1="60" y1="220" x2="220" y2="100" stroke="#2F5BEA" stroke-width="4.5" marker-end="url(#ahBlue)"/>
+            <path d="M60 246 H220" fill="none" stroke="#E09106" stroke-width="4"/>
+            <path d="M60 240 v12 M220 240 v12" stroke="#E09106" stroke-width="4"/>
+            <text class="cap" x="140" y="88">v = [4, 3]</text>
+
+            <g>
+              <rect x="300" y="60" width="16" height="16" fill="#2F5BEA" rx="3"/>
+              <text class="cap" x="326" y="73" text-anchor="start" font-weight="700">5 &mdash; straight line</text>
+              <text class="cap" x="326" y="93" text-anchor="start">what a bird flies&nbsp;&middot;&nbsp;&#8214;v&#8214;&#8322;</text>
+
+              <rect x="300" y="130" width="16" height="16" fill="#DD3178" rx="3"/>
+              <text class="cap" x="326" y="143" text-anchor="start" font-weight="700">7 &mdash; staircase</text>
+              <text class="cap" x="326" y="163" text-anchor="start">what a taxi drives&nbsp;&middot;&nbsp;&#8214;v&#8214;&#8321;</text>
+
+              <rect x="300" y="200" width="16" height="16" fill="#E09106" rx="3"/>
+              <text class="cap" x="326" y="213" text-anchor="start" font-weight="700">4 &mdash; biggest step</text>
+              <text class="cap" x="326" y="233" text-anchor="start">the worst offender&nbsp;&middot;&nbsp;&#8214;v&#8214;&#8734;</text>
+            </g>
+          </svg>
+          <figcaption>Ask &ldquo;how big is this?&rdquo; and always check <em>which</em> kind of big someone means.</figcaption>
+        </figure>
+      </div>
+
+      <p class="grouphead">How big is it?</p>
+      <div class="cards">
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">01</span><h4>Magnitude</h4></div>
+              <div class="mini__val">&#8214;v&#8214; = 5</div>
+              <p class="mini__slots">How long the arrow is.</p>
+              <p>v = [4, 3] &rarr; &radic;(16 + 9) = 5</p>
+              <p class="use"><b>Used for</b>Speed from a velocity, signal strength, how far off an answer is</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">02</span><h4>Manhattan length</h4></div>
+              <div class="mini__val">&#8214;v&#8214;&#8321; = 7</div>
+              <p class="mini__slots">Total steps taken, no diagonals allowed.</p>
+              <p>[4, 3] &rarr; 4 + 3 = 7</p>
+              <p class="use"><b>Used for</b>Taxi fares, city routing, feature selection in machine learning</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">03</span><h4>Biggest component</h4></div>
+              <div class="mini__val">&#8214;v&#8214;&#8734; = 4</div>
+              <p class="mini__slots">Just the largest single entry.</p>
+              <p>[4, 3] &rarr; 4</p>
+              <p class="use"><b>Used for</b>Worst-case tolerances: no part may drift more than this</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">04</span><h4>Distance</h4></div>
+              <div class="mini__val">d = 5</div>
+              <p class="mini__slots">How far apart two points are.</p>
+              <p>(1, 2) to (5, 5) &rarr; &radic;(16 + 9) = 5</p>
+              <p class="use"><b>Used for</b>GPS proximity, clustering customers, nearest-neighbour search</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">05</span><h4>Scalar</h4></div>
+              <div class="mini__val">k = 2</div>
+              <p class="mini__slots">A plain number that resizes a vector.</p>
+              <p>2 &times; [4, 3] = [8, 6]</p>
+              <p class="use"><b>Used for</b>Volume knobs, zoom levels, learning rates</p>
+            </div>
+      </div>
+
+      <p class="grouphead">How alike are two things?</p>
+      <div class="split" style="margin-top:16px">
+        <div class="prose">
+          <p>Numbers 06 to 09 all answer versions of the same question: do these two lists point the same way? <strong>Cosine similarity</strong> is the one that runs the modern internet, because it ignores size entirely.</p>
+          <p>A long article and a short tweet about the same subject have very different magnitudes but nearly the same direction &mdash; so cosine says &ldquo;these match&rdquo; where a raw dot product would just say &ldquo;the article is bigger&rdquo;.</p>
+        </div>
+        <figure>
+          <svg class="dia" viewBox="0 0 560 210" role="img" aria-labelledby="cosT cosD">
+            <title id="cosT">Cosine similarity at four different angles</title>
+            <desc id="cosD">Two arrows shown on top of each other, at forty five degrees, at right angles, and pointing opposite ways, with values one, zero point seven, zero and minus one.</desc>
+            <g>
+              <line x1="30" y1="130" x2="112" y2="66" stroke="#2F5BEA" stroke-width="5" marker-end="url(#ahBlue)"/>
+              <line x1="34" y1="134" x2="106" y2="78" stroke="#DD3178" stroke-width="4" marker-end="url(#ahPink)"/>
+              <text class="cap" x="76" y="168" font-weight="700">1.0</text>
+              <text class="cap" x="76" y="188">same thing</text>
+            </g>
+            <g transform="translate(140,0)">
+              <line x1="30" y1="130" x2="112" y2="66" stroke="#2F5BEA" stroke-width="5" marker-end="url(#ahBlue)"/>
+              <line x1="30" y1="130" x2="112" y2="122" stroke="#DD3178" stroke-width="4" marker-end="url(#ahPink)"/>
+              <text class="cap" x="76" y="168" font-weight="700">0.7</text>
+              <text class="cap" x="76" y="188">related</text>
+            </g>
+            <g transform="translate(280,0)">
+              <line x1="30" y1="130" x2="112" y2="130" stroke="#2F5BEA" stroke-width="5" marker-end="url(#ahBlue)"/>
+              <line x1="30" y1="130" x2="30" y2="52" stroke="#DD3178" stroke-width="4" marker-end="url(#ahPink)"/>
+              <path d="M46 130 a16 16 0 0 0 -16 -16" fill="none" stroke="#54628A" stroke-width="1.4"/>
+              <text class="cap" x="76" y="168" font-weight="700">0.0</text>
+              <text class="cap" x="76" y="188">nothing in common</text>
+            </g>
+            <g transform="translate(420,0)">
+              <line x1="72" y1="98" x2="130" y2="98" stroke="#2F5BEA" stroke-width="5" marker-end="url(#ahBlue)"/>
+              <line x1="68" y1="98" x2="14" y2="98" stroke="#DD3178" stroke-width="4" marker-end="url(#ahPink)"/>
+              <text class="cap" x="72" y="168" font-weight="700">&minus;1.0</text>
+              <text class="cap" x="72" y="188">exact opposites</text>
+            </g>
+          </svg>
+          <figcaption>Cosine similarity only ever looks at the angle, never the length.</figcaption>
+        </figure>
+      </div>
+      <div class="cards">
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">06</span><h4>Dot product</h4></div>
+              <div class="mini__val">a&middot;b = 26</div>
+              <p class="mini__slots">Pair up, multiply, add.</p>
+              <p>[2, 5, 1] &middot; [3, 2, 10] = 26</p>
+              <p class="use"><b>Used for</b>Totals on a receipt, weighted scores, every neuron in a neural net</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">07</span><h4>Cosine similarity</h4></div>
+              <div class="mini__val">cos&theta; = 0.97</div>
+              <p class="mini__slots">Agreement ignoring size, from &minus;1 to 1.</p>
+              <p>[4, 3] vs [8, 6] &rarr; 1.0, identical direction</p>
+              <p class="use"><b>Used for</b>&ldquo;Related articles&rdquo;, plagiarism checks, semantic search</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">08</span><h4>Angle</h4></div>
+              <div class="mini__val">&theta; = 45&deg;</div>
+              <p class="mini__slots">The turn between two directions.</p>
+              <p>[1, 0] and [1, 1] &rarr; 45&deg;</p>
+              <p class="use"><b>Used for</b>Robot arm joints, camera framing, crosswind on a runway</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">09</span><h4>Projection</h4></div>
+              <div class="mini__val">p = 3</div>
+              <p class="mini__slots">The shadow one vector casts on another.</p>
+              <p>[3, 3] onto the flat direction [1, 0] &rarr; 3</p>
+              <p class="use"><b>Used for</b>Splitting a force into useful and wasted, stripping bias from data</p>
+            </div>
+      </div>
+
+      <p class="grouphead">What does this matrix do?</p>
+      <div class="cards">
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">10</span><h4>Determinant</h4></div>
+              <div class="mini__val">det = 5</div>
+              <p class="mini__slots">The area stretch factor.</p>
+              <p>[[3, 1], [1, 2]] &rarr; 6 &minus; 1 = 5</p>
+              <p class="use"><b>Used for</b>Checking a transform can be undone, graphics, unit conversion</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">11</span><h4>Trace</h4></div>
+              <div class="mini__val">tr = 15</div>
+              <p class="mini__slots">The diagonal total.</p>
+              <p>diagonal 2, 5, 8 &rarr; 15</p>
+              <p class="use"><b>Used for</b>Fast eigenvalue sanity checks, conservation laws in physics</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">12</span><h4>Eigenvalue</h4></div>
+              <div class="mini__val">&lambda; = 3</div>
+              <p class="mini__slots">Stretch along a direction that refuses to turn.</p>
+              <p>A[1, 1] = [3, 3] &rarr; &lambda; = 3</p>
+              <p class="use"><b>Used for</b>Stability of systems, PageRank, vibration frequencies</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">13</span><h4>Rank</h4></div>
+              <div class="mini__val">rank = 1</div>
+              <p class="mini__slots">How many genuinely different directions there are.</p>
+              <p>[[1, 2], [2, 4]] &rarr; row 2 is row 1 doubled, so only 1</p>
+              <p class="use"><b>Used for</b>Spotting duplicate survey questions, compression, is it solvable</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">14</span><h4>Condition number</h4></div>
+              <div class="mini__val">&kappa; = 12</div>
+              <p class="mini__slots">How badly a small input error blows up.</p>
+              <p>1 = rock solid&nbsp;&nbsp;&middot;&nbsp;&nbsp;1,000,000 = do not trust it</p>
+              <p class="use"><b>Used for</b>Engineering simulations, financial models, GPS with poor satellites</p>
+            </div>
+      </div>
+
+      <p class="grouphead">What does this data say?</p>
+      <div class="cards">
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">15</span><h4>Mean</h4></div>
+              <div class="mini__val">&mu; = 3.5</div>
+              <p class="mini__slots">The balance point of a list.</p>
+              <p>[2, 3, 4, 5] &rarr; 14 &divide; 4 = 3.5</p>
+              <p class="use"><b>Used for</b>Baselines, and centring data before running PCA</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">16</span><h4>Variance</h4></div>
+              <div class="mini__val">&sigma;&sup2; = 1.25</div>
+              <p class="mini__slots">Average squared distance from the mean.</p>
+              <p>[2, 3, 4, 5] around 3.5 &rarr; 1.25</p>
+              <p class="use"><b>Used for</b>Risk in finance, quality control, which eigenvector matters most</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">17</span><h4>Probability</h4></div>
+              <div class="mini__val">p = 0.6</div>
+              <p class="mini__slots">One slot of a list that adds up to 1.</p>
+              <p>[0.6, 0.4] &rarr; 60% chance of the first outcome</p>
+              <p class="use"><b>Used for</b>Weather forecasts, classifier confidence, long-run market share</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">18</span><h4>Zero</h4></div>
+              <div class="mini__val">0</div>
+              <p class="mini__slots">The single most informative number here.</p>
+              <p>dot = 0 &rarr; at right angles&nbsp;&middot;&nbsp;det = 0 &rarr; squashed flat, no undo</p>
+              <p class="use"><b>Used for</b>Detecting redundancy, testing independence, catching broken models</p>
+            </div>
+      </div>
+
+      <div class="note note--warn">
+        <b>The thing to notice</b>
+        Every value in this gallery is a whole vector or matrix boiled down to one number. That's useful and lossy at the same time &mdash; two completely different baskets can share a total. Always ask what got thrown away.
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ 18 VECTORS ============================ -->
+<section class="section" id="vectors" style="padding-top:0">
+  <div class="wrap">
+    <article class="entry card rise">
+      <div class="entry__head"><span class="entry__num">GALLERY</span><h2>Eighteen vectors</h2></div>
+      <p class="entry__one">None of these are maths exercises. Every one is a list of numbers doing a real job somewhere today &mdash; and every one obeys the rules in item 01.</p>
+
+      <div class="split">
+        <div class="prose">
+          <h3>The only thing that changes is how many slots</h3>
+          <p>A GPS fix needs 2 numbers. A colour needs 3. A photo of a handwritten digit needs 784 &mdash; one per pixel. A gene expression profile needs 20,000.</p>
+          <p>That count is the <strong>n</strong> in &#8477;&#8319;. Nothing else about the maths changes: you still add matching slots, you still dot two lists together, you still measure length the same way. The rules learned on a 2-slot arrow carry all the way up.</p>
+          <p>Humans stop being able to picture it past 3 slots. That's a limitation of eyeballs, not of the maths, and it stops nobody.</p>
+          <div class="note note--real">
+            <b>Why big vectors matter</b>
+            &ldquo;Similar photos&rdquo;, &ldquo;songs you might like&rdquo; and &ldquo;did this email mean the same thing&rdquo; are all answered by turning the thing into a long vector and checking which other vectors point the same way.
+          </div>
+        </div>
+        <figure>
+          <svg class="dia" viewBox="0 0 540 300" role="img" aria-labelledby="ldT ldD">
+            <title id="ldT">How many slots different real vectors need</title>
+            <desc id="ldD">Bars comparing vector lengths from two slots for a GPS position up to twenty thousand for gene expression.</desc>
+            <text class="cap" x="270" y="22" font-weight="700">how many numbers in the list?</text>
+            <text class="cap" x="150" y="61" text-anchor="end">GPS position</text><rect x="160" y="46" width="62.9" height="22" rx="3" fill="#2F5BEA" fill-opacity=".85"/><text class="cap" x="232.9" y="61" text-anchor="start" font-weight="700">2 slots</text>
+            <text class="cap" x="150" y="95" text-anchor="end">Colour</text><rect x="160" y="80" width="79.9" height="22" rx="3" fill="#DD3178" fill-opacity=".85"/><text class="cap" x="249.9" y="95" text-anchor="start" font-weight="700">3 slots</text>
+            <text class="cap" x="150" y="129" text-anchor="end">Nutrition</text><rect x="160" y="114" width="91.9" height="22" rx="3" fill="#0B9484" fill-opacity=".85"/><text class="cap" x="261.9" y="129" text-anchor="start" font-weight="700">4 slots</text>
+            <text class="cap" x="150" y="163" text-anchor="end">Your ratings</text><rect x="160" y="148" width="197.3" height="22" rx="3" fill="#E09106" fill-opacity=".85"/><text class="cap" x="367.3" y="163" text-anchor="start" font-weight="700">50 slots</text>
+            <text class="cap" x="150" y="197" text-anchor="end">Word meaning</text><rect x="160" y="182" width="272.1" height="22" rx="3" fill="#2F5BEA" fill-opacity=".85"/><text class="cap" x="442.1" y="197" text-anchor="start" font-weight="700">300 slots</text>
+            <text class="cap" x="150" y="231" text-anchor="end">Image</text><rect x="160" y="216" width="312.1" height="22" rx="3" fill="#DD3178" fill-opacity=".85"/><text class="cap" x="482.1" y="231" text-anchor="start" font-weight="700">784 slots</text>
+            <text class="cap" x="150" y="265" text-anchor="end">Gene expression</text><rect x="160" y="250" width="447.3" height="22" rx="3" fill="#0B9484" fill-opacity=".85"/><text class="cap" x="617.3" y="265" text-anchor="start" font-weight="700">20,000 slots</text>
+            <text class="cap" x="270" y="288">bar length is on a squashed scale &mdash; the real jump is far bigger</text>
+          </svg>
+          <figcaption>Same rules at every size. Only the number of slots changes.</figcaption>
+        </figure>
+      </div>
+
+      <p class="grouphead">Things in the physical world</p>
+      <div class="cards">
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V01</span><h4>GPS position</h4></div>
+              <div class="mini__val">[51.5074, &minus;0.1278]</div>
+              <p class="mini__slots">latitude &middot; longitude</p>
+              <p>Where the Tower of London stands.</p>
+              <p class="use"><b>Used for</b>Maps, delivery routing, geofenced reminders</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V02</span><h4>Velocity</h4></div>
+              <div class="mini__val">[12, &minus;3] m/s</div>
+              <p class="mini__slots">speed east &middot; speed north</p>
+              <p>A drone drifting east and slipping south.</p>
+              <p class="use"><b>Used for</b>Flight paths, weather models, game physics</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V03</span><h4>Force</h4></div>
+              <div class="mini__val">[0, &minus;9.8] N</div>
+              <p class="mini__slots">sideways push &middot; downward pull</p>
+              <p>Gravity, pulling straight down and not at all sideways.</p>
+              <p class="use"><b>Used for</b>Bridge load calculations, rocket thrust, game engines</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V04</span><h4>Colour</h4></div>
+              <div class="swatch" style="background:#FF5733"></div><div class="mini__val">[255, 87, 51]</div>
+              <p class="mini__slots">red &middot; green &middot; blue</p>
+              <p>A warm orange &mdash; the swatch above is this exact vector.</p>
+              <p class="use"><b>Used for</b>Every single pixel on this screen, right now</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V05</span><h4>Shopping basket</h4></div>
+              <div class="mini__val">[2, 5, 1]</div>
+              <p class="mini__slots">coffees &middot; pastries &middot; cakes</p>
+              <p>Dot it with the price list and you get your bill.</p>
+              <p class="use"><b>Used for</b>Tills, stock control, warehouse picking</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V06</span><h4>Unit direction</h4></div>
+              <div class="mini__val">[0.6, 0.8]</div>
+              <p class="mini__slots">pure heading, length exactly 1</p>
+              <p>Which way, with the &ldquo;how far&rdquo; deliberately stripped out.</p>
+              <p class="use"><b>Used for</b>Steering in games, 3D lighting, ship and aircraft headings</p>
+            </div>
+      </div>
+
+      <p class="grouphead">Things people buy, own and decide</p>
+      <div class="cards">
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V07</span><h4>Word meaning</h4></div>
+              <div class="mini__val">[0.21, &minus;0.44, &hellip;]</div>
+              <p class="mini__slots">300 learned features nobody named</p>
+              <p>&ldquo;King&rdquo; and &ldquo;queen&rdquo; land close together in this space.</p>
+              <p class="use"><b>Used for</b>Search engines, translation, chatbots and language models</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V08</span><h4>Image</h4></div>
+              <div class="mini__val">[0, 0, 34, 255, &hellip;]</div>
+              <p class="mini__slots">784 slots, one brightness per pixel</p>
+              <p>A 28&times;28 handwritten digit, unrolled into one long list.</p>
+              <p class="use"><b>Used for</b>Handwriting recognition, medical scan analysis, photo search</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V09</span><h4>Sound</h4></div>
+              <div class="mini__val">[0.02, &minus;0.11, &hellip;]</div>
+              <p class="mini__slots">1024 slots, air pressure over time</p>
+              <p>A fiftieth of a second of music, measured very fast.</p>
+              <p class="use"><b>Used for</b>Shazam, voice assistants, noise-cancelling headphones</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V10</span><h4>One-hot label</h4></div>
+              <div class="mini__val">[0, 1, 0, 0]</div>
+              <p class="mini__slots">cat &middot; dog &middot; bird &middot; fish</p>
+              <p>The answer is &ldquo;dog&rdquo;, written so a computer can do sums with it.</p>
+              <p class="use"><b>Used for</b>Every supervised machine-learning training set</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V11</span><h4>Portfolio</h4></div>
+              <div class="mini__val">[0.5, 0.3, 0.2]</div>
+              <p class="mini__slots">shares &middot; bonds &middot; cash</p>
+              <p>Half in shares, and the slots always add to 1.</p>
+              <p class="use"><b>Used for</b>Risk management, robo-advisors, pension fund design</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V12</span><h4>Forecast</h4></div>
+              <div class="mini__val">[0.6, 0.4]</div>
+              <p class="mini__slots">outcome A &middot; outcome B</p>
+              <p>A 60/40 split of belief about what happens next.</p>
+              <p class="use"><b>Used for</b>Election models, weather, the steady state of item 09</p>
+            </div>
+      </div>
+
+      <p class="grouphead">Things computers turn into numbers</p>
+      <div class="cards">
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V13</span><h4>Nutrition</h4></div>
+              <div class="mini__val">[250, 12, 30, 8]</div>
+              <p class="mini__slots">kcal &middot; fat &middot; carbs &middot; protein</p>
+              <p>One croissant, as far as a diet app is concerned.</p>
+              <p class="use"><b>Used for</b>Food labelling, meal planners, hospital nutrition</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V14</span><h4>Accelerometer</h4></div>
+              <div class="mini__val">[0.02, 0.98, 0.11]</div>
+              <p class="mini__slots">x &middot; y &middot; z, in g</p>
+              <p>A phone lying flat: nearly all the pull is downward.</p>
+              <p class="use"><b>Used for</b>Step counters, screen rotation, car crash detection</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V15</span><h4>Your ratings</h4></div>
+              <div class="mini__val">[5, 0, 3, 4]</div>
+              <p class="mini__slots">one slot per film, 0 = not seen</p>
+              <p>Two people with similar vectors get similar suggestions.</p>
+              <p class="use"><b>Used for</b>Netflix, Spotify, every recommendation engine</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V16</span><h4>Gradient</h4></div>
+              <div class="mini__val">[&minus;0.4, 0.9]</div>
+              <p class="mini__slots">which way to nudge each dial</p>
+              <p>The direction of steepest improvement, one slot per setting.</p>
+              <p class="use"><b>Used for</b>How every neural network on earth actually learns</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V17</span><h4>Surface normal</h4></div>
+              <div class="mini__val">[0, 0, 1]</div>
+              <p class="mini__slots">the direction a surface faces</p>
+              <p>Straight up, out of a flat floor.</p>
+              <p class="use"><b>Used for</b>3D lighting and shadows, collision detection, CAD</p>
+            </div>
+            <div class="mini">
+              <div class="mini__top"><span class="mini__n">V18</span><h4>Gene expression</h4></div>
+              <div class="mini__val">[8.2, 0.1, 3.4, &hellip;]</div>
+              <p class="mini__slots">20,000 slots, one per gene</p>
+              <p>How busy each gene is in one tissue sample.</p>
+              <p class="use"><b>Used for</b>Cancer subtyping, drug discovery, disease research</p>
+            </div>
+      </div>
+
+      <div class="work">
+        <b>All eighteen obey the same rules &mdash; here it is on the basket</b>
+        <code>basket = [2, 5, 1]     prices = [3.00, 2.00, 10.00]
+
+Add a second basket (item 01):
+   [2, 5, 1] + [1, 0, 2] = <span class="ans">[3, 5, 3]</span>
+
+Double the order (a scalar, value 05):
+   2 &times; [2, 5, 1] = <span class="ans">[4, 10, 2]</span>
+
+Get the bill (item 02):
+   [2,5,1] &middot; [3,2,10] = 6 + 10 + 10 = <span class="ans">&pound;26.00</span>
+
+Exactly the same three moves work on a 20,000-slot
+gene profile. Nothing about the maths gets harder.</code>
+      </div>
+
+      <div class="note">
+        <b>The takeaway</b>
+        Turning a real thing into a vector is most of the work in modern computing. Once it's a list of numbers, everything on this page &mdash; distance, similarity, eigenvectors &mdash; becomes available to it at once.
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ RECAP ============================ -->
+<section class="section" id="recap">
+  <div class="wrap">
+    <div class="card rise">
+      <p class="eyebrow" style="margin-bottom:10px">One-screen recap</p>
+      <h2 style="font-size:clamp(24px,3.4vw,32px);font-weight:700">The whole sheet in eight lines</h2>
+      <div class="scroller" style="margin-top:22px">
+        <table>
+          <caption style="text-align:left;color:var(--soft);font-size:14px;padding-bottom:10px">Each item, what it does, and what comes out.</caption>
+          <thead>
+            <tr><th scope="col">Item</th><th scope="col">In one sentence</th><th scope="col">Goes in</th><th scope="col">Comes out</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Vector</td><td>A list of numbers in a fixed order.</td><td>&mdash;</td><td><code>a list</code></td></tr>
+            <tr><td>Dot product</td><td>Pair up, multiply, add it all together.</td><td>two equal-length lists</td><td><code>one number</code></td></tr>
+            <tr><td>Matrix multiplication</td><td>A dot product for every row-meets-column.</td><td>m&times;n and n&times;p</td><td><code>an m&times;p grid</code></td></tr>
+            <tr><td>Transpose</td><td>Flip the grid over its diagonal.</td><td>an m&times;n grid</td><td><code>an n&times;m grid</code></td></tr>
+            <tr><td>Inverse</td><td>The undo button; A&#8315;&#185;A = I.</td><td>a square grid</td><td><code>a square grid</code></td></tr>
+            <tr><td>Determinant</td><td>How much area gets stretched; 0 means squashed flat.</td><td>a square grid</td><td><code>one number</code></td></tr>
+            <tr><td>Trace</td><td>Add up the main diagonal.</td><td>a square grid</td><td><code>one number</code></td></tr>
+            <tr><td>Eigenvalue equation</td><td>Directions that don't turn, only scale.</td><td>a square grid</td><td><code>directions + factors</code></td></tr>
+            <tr><td>&mdash; in practice</td><td>Solve det(A &minus; &lambda;I) = 0, then find each direction.</td><td>a square grid</td><td><code>&lambda;&#8321;&hellip;&lambda;&#8345; and v&#8321;&hellip;v&#8345;</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <b>If you remember only one thing</b>
+        Almost everything here is the dot product wearing a disguise. Learn item 02 properly and items 03 to 08 stop being frightening.
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    A plain-language walkthrough of the eight items on the &ldquo;1. Linear Algebra&rdquo; reference card. All diagrams are hand-built SVG &mdash; nothing loads from anywhere, so this file works offline.
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- reveal on scroll ---------- */
+  var risers = document.querySelectorAll(".rise");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reduce || !("IntersectionObserver" in window)) {
+    risers.forEach(function (el) { el.classList.add("seen"); });
+  } else {
+    var revealer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("seen");
+          revealer.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.06 });
+    risers.forEach(function (el) { revealer.observe(el); });
+  }
+
+  /* ---------- sticky index highlighting ---------- */
+  var links = Array.prototype.slice.call(document.querySelectorAll(".index a"));
+  var targets = links
+    .map(function (a) { return document.querySelector(a.getAttribute("href")); })
+    .filter(Boolean);
+
+  if ("IntersectionObserver" in window && targets.length) {
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        links.forEach(function (a) {
+          a.classList.toggle("on", a.getAttribute("href") === "#" + entry.target.id);
+        });
+      });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    targets.forEach(function (t) { spy.observe(t); });
+  }
+
+  /* ---------- matrix multiplication stepper ---------- */
+  var rowHL = document.getElementById("mm-row");
+  var colHL = document.getElementById("mm-col");
+  var cellHL = document.getElementById("mm-cell");
+  var caption = document.getElementById("mm-cap");
+  var nextBtn = document.getElementById("mm-next");
+  var resetBtn = document.getElementById("mm-reset");
+  var outs = ["mm-c0", "mm-c1", "mm-c2", "mm-c3"].map(function (id) {
+    return document.getElementById(id);
+  });
+
+  if (rowHL && colHL && cellHL && caption && nextBtn && resetBtn) {
+    var steps = [
+      { rowY: 210, colX: 290, cellX: 290, cellY: 210,
+        text: "<strong>Row 1</strong> of A meets <strong>column 1</strong> of B: 1&times;5 + 2&times;7 = <strong>19</strong>" },
+      { rowY: 210, colX: 350, cellX: 350, cellY: 210,
+        text: "<strong>Row 1</strong> meets <strong>column 2</strong>: 1&times;6 + 2&times;8 = <strong>22</strong>" },
+      { rowY: 270, colX: 290, cellX: 290, cellY: 270,
+        text: "<strong>Row 2</strong> meets <strong>column 1</strong>: 3&times;5 + 4&times;7 = <strong>43</strong>" },
+      { rowY: 270, colX: 350, cellX: 350, cellY: 270,
+        text: "<strong>Row 2</strong> meets <strong>column 2</strong>: 3&times;6 + 4&times;8 = <strong>50</strong>. Every cell is filled." }
+    ];
+    var at = -1;
+
+    function draw() {
+      if (at < 0) {
+        rowHL.setAttribute("opacity", "0");
+        colHL.setAttribute("opacity", "0");
+        cellHL.setAttribute("opacity", "0");
+        outs.forEach(function (t) { if (t) t.setAttribute("opacity", "0"); });
+        caption.innerHTML = "Press <strong>Next step</strong> to fill the answer one cell at a time.";
+        nextBtn.textContent = "Next step";
+        return;
+      }
+      var s = steps[at];
+      rowHL.setAttribute("y", s.rowY);
+      rowHL.setAttribute("opacity", "1");
+      colHL.setAttribute("x", s.colX);
+      colHL.setAttribute("opacity", "1");
+      cellHL.setAttribute("x", s.cellX);
+      cellHL.setAttribute("y", s.cellY);
+      cellHL.setAttribute("opacity", "1");
+      outs.forEach(function (t, i) {
+        if (t) t.setAttribute("opacity", i <= at ? "1" : "0");
+      });
+      caption.innerHTML = s.text;
+      nextBtn.textContent = at >= steps.length - 1 ? "Start over" : "Next step";
+    }
+
+    nextBtn.addEventListener("click", function () {
+      at = at >= steps.length - 1 ? -1 : at + 1;
+      draw();
+    });
+    resetBtn.addEventListener("click", function () { at = -1; draw(); });
+    draw();
+  }
+})();
+</script>
+</body>
+</html>
